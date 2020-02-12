@@ -65,7 +65,7 @@ public class Patch {
 
     /**
      * add an edit to this patch.
-     * 
+     *
      * @param edit - the edit to be added
      * @throws IllegalArgumentException if the edit is of a different type
      *         (i.e. line/statement) to those already in the patch
@@ -76,7 +76,7 @@ public class Patch {
         } else {
             if ((superClassOfEdits == null) || superClassOfEdits.isAssignableFrom(edit.getClass())) {
                 this.edits.add(edit);
-                
+
                 if (superClassOfEdits == null) {
                     if (StatementEdit.class.isAssignableFrom(edit.getClass())) {
                         superClassOfEdits = StatementEdit.class;
@@ -101,12 +101,12 @@ public class Patch {
     public String apply() {
 
         SourceFile patchedSourceFile = sourceFile.copyOf();
-        
+
         for (Edit edit: edits) {
             try {
                 patchedSourceFile = edit.apply(patchedSourceFile);
             } catch(Exception e) {
-                // any problem applying the edit means 
+                // any problem applying the edit means
                 // we just don't apply it
             }
         }
@@ -118,7 +118,7 @@ public class Patch {
             // - see https://github.com/drdrwhite/ginfork/issues/104
             return sourceFile.getSource();
         }
-        
+
     }
 
     public void addRandomEdit(Random rng, EditType allowableEditType) {
@@ -132,19 +132,19 @@ public class Patch {
     private Edit randomEdit(Random rng, List<EditType> allowableEditTypes) {
         // generate a random edit. target methods are accounted for here
         // by pulling the appropriate line/statement IDs from sourceFile
-        
+
         if (allowableEditTypes.isEmpty()) {
             Logger.error("No edit types were specified.");
             System.exit(-1);
         }
-        
+
         Edit edit = null;
 
         // decide what edit we're doing to make
         // first, choose an overall type (line,statement,substatement)
         // then choose a particular kind of edit within that type (copy/delete/move etc.)
-        EditType editType = allowableEditTypes.get(rng.nextInt(allowableEditTypes.size())); 
-        
+        EditType editType = allowableEditTypes.get(rng.nextInt(allowableEditTypes.size()));
+
         try {
             switch (editType) {
                 case LINE:
@@ -208,7 +208,7 @@ public class Patch {
                         break;
     */
                     }
-                    
+
                     break;
                 case MATCHED_STATEMENT:
                     editSubType = rng.nextInt(4);
@@ -237,7 +237,7 @@ public class Patch {
             // we get here if the chosen edit couldn't be created for the given source file
             // leave edit null, it'll be filled below.
         }
-        
+
         if (edit == null) {
             edit = new NoEdit();
         }
@@ -260,22 +260,34 @@ public class Patch {
         }
 
     }
-    
+
+    public void writePatchStringToFile(String filename) {
+      String finalPatch = this.toString();
+      try {
+          FileUtils.writeStringToFile(new File(filename), finalPatch, Charset.defaultCharset());
+      } catch (IOException e) {
+          Logger.error("Exception writing patch string to: " + filename);
+          Logger.trace(e);
+          System.exit(-1);
+      }
+
+   }
+
     public boolean isOnlyLineEdits() {
         boolean rval = true;
         for (Edit e : edits) {
             rval &= e.getEditType() == EditType.LINE;
         }
-        
+
         return rval;
     }
-    
+
     public boolean isOnlyStatementEdits() {
         boolean rval = true;
         for (Edit e : edits) {
             rval &= e.getEditType() != EditType.LINE;
         }
-        
+
         return rval;
     }
 
@@ -290,4 +302,3 @@ public class Patch {
 
 
 }
-

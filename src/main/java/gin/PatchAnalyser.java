@@ -15,6 +15,7 @@ import gin.test.UnitTestResultSet;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.pmw.tinylog.Logger;
 
 import com.sampullara.cli.Args;
@@ -77,6 +78,31 @@ public class PatchAnalyser {
                 this.testClassName = this.className + "Test";
             }
 
+    }
+    //Alternate public constructor for chaining
+     public PatchAnalyser(File source, String patchText, File packageDir, String className, String classPath, String testClassName) {
+        this.source = source;
+        this.patchText = patchText;
+        this.packageDir = packageDir;
+        this.className = className;
+        this.classPath = classPath;
+        this.testClassName = testClassName;
+
+        this.sourceFileLine = new SourceFileLine(source.getAbsolutePath(), null);
+
+        this.sourceFileTree = new SourceFileTree(source.getAbsolutePath(), null);
+        if (this.packageDir == null) {
+            this.packageDir = this.source.getParentFile().getAbsoluteFile();
+        }
+        if (this.classPath == null) {
+            this.classPath = this.packageDir.getAbsolutePath();
+        }
+        if (this.className == null) {
+            this.className = FilenameUtils.removeExtension(this.source.getName());
+        }
+        if (this.testClassName == null) {
+            this.testClassName = this.className + "Test";
+        }
     }
 
     private void analyse() {
@@ -151,6 +177,91 @@ public class PatchAnalyser {
         } else {
             Logger.info("Speedup (%): not applicable");
         }
+
+    }
+
+    public List<String> getAnalysisResults() {
+        // Create SourceFile and tester classes, parse the patch and generate patched source.
+        SourceFileLine sourceFileLine = new SourceFileLine(source.getAbsolutePath(), null);
+        SourceFileTree sourceFileTree = new SourceFileTree(source.getAbsolutePath(), null);
+
+        this.testRunner = new InternalTestRunner(className, classPath, testClassName);
+
+        // Dump statement numbering to a file
+        String statementNumbering = sourceFileTree.statementList();
+        String statementFilename = source + ".statements";
+        try {
+            FileUtils.writeStringToFile(new File(statementFilename), statementNumbering, Charset.defaultCharset());
+        } catch (IOException e) {
+            Logger.error("Could not write statements to " + statementFilename);
+            Logger.trace(e);
+            System.exit(-1);
+        }
+
+        Logger.info("Statement numbering written to: " + statementFilename);
+
+        // Dump block numbering to a file
+        String blockNumbering = sourceFileTree.blockList();
+        String blockFilename = source + ".blocks";
+        try {
+            FileUtils.writeStringToFile(new File(blockFilename), blockNumbering, Charset.defaultCharset());
+        } catch (IOException e) {
+            Logger.error("Could not write blocks to " + blockFilename);
+            Logger.trace(e);
+            System.exit(-1);
+        }
+        Logger.info("Block numbering written to: " + blockFilename);
+
+        Patch patch = parsePatch(patchText, sourceFileLine, sourceFileTree);
+        String patchedSource = patch.apply();
+
+        Logger.info("Evaluating patch for Source: " + source);
+
+        Logger.info("Patch is: " + patchText);
+
+        // Write the patched source to file, for reference
+        String patchedFilename = source + ".patched";
+        try {
+            FileUtils.writeStringToFile(new File(patchedFilename), patchedSource, Charset.defaultCharset());
+        } catch (IOException e) {
+            Logger.error("Could not write patched source to " + patchedFilename);
+            Logger.trace(e);
+            System.exit(-1);
+        }
+        Logger.info("Parsed patch written to: " + patchedFilename);
+
+        // Evaluate original class
+        Logger.info("Timing original class execution...");
+        Patch emptyPatch = new Patch(sourceFileTree);
+        long originalExecutionTime = testRunner.runTests(emptyPatch, REPS).totalExecutionTime();
+        Logger.info("Original execution time: " + originalExecutionTime);
+
+        // Evaluate patch
+        Logger.info("Timing patched sourceFile execution...");
+        UnitTestResultSet resultSet = testRunner.runTests(patch, REPS);
+
+        // Output test results
+        logTestResults(resultSet);
+
+        Logger.info("Execution time of patched sourceFile: " + resultSet.totalExecutionTime());
+        float speedup = 100.0f * ((originalExecutionTime - resultSet.totalExecutionTime()) /
+                (1.0f * originalExecutionTime));
+        if (resultSet.getValidPatch() && resultSet.getCleanCompile()) {
+            Logger.info("Speedup (%): " + speedup);
+        } else {
+            Logger.info("Speedup (%): not applicable");
+        }
+        long averageExecutionTime = resultSet.totalExecutionTime() / REPS;
+
+
+        ArrayList<String> analysisResults = new ArrayList<String>();
+        analysisResults.add(patchText);
+        analysisResults.add(Boolean.toString(resultSet.getValidPatch()));
+        analysisResults.add(Boolean.toString(resultSet.allTestsSuccessful()));
+        analysisResults.add(Long.toString(averageExecutionTime));
+        analysisResults.add(Float.toString(speedup));
+        return analysisResults;
+
 
     }
 
@@ -232,8 +343,8 @@ public class PatchAnalyser {
 
         Logger.info("Test Results");
         Logger.info("Number of results: " + results.getResults().size());
-        Logger.info("Valid patch: " + results.getValidPatch());
-        Logger.info("Cleanly compiled: " + results.getCleanCompile());
+        Logger.info("Valid patch: " + results.getValidPatch()); //patch can be applied without throwing error. Does not have to pass
+        Logger.info("Cleanly compiled: " + results.getCleanCompile()); //patched source can be compiled
         Logger.info("All tests successful: " + results.allTestsSuccessful());
         Logger.info("Total execution time: " + results.totalExecutionTime());
 

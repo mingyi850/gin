@@ -33,7 +33,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * EvoSuite test generator.
- * 
+ *
  * Generates unit tests for Maven and Gradle projects.
  * Runs generated tests for Maven projects.
  */
@@ -61,25 +61,31 @@ public class TestCaseGenerator {
     protected File projectTarget;
 
     @Argument(alias = "outputDir", description = "Output directory for generated tests; for maven projects the pom file will be updated automatically")
-    protected File outputDir; 
+    protected File outputDir;
 
     @Argument(alias = "removeTests", description = "Remove existing tests from outputDir, set to projectDir/src/java/test if outputDir not specified")
     protected boolean removeTests = false;
 
-    @Argument(alias = "genearateTests", description = "Generate tests for classNames or projectTarget")
+    @Argument(alias = "generateTests", description = "Generate tests for classNames or projectTarget")
     protected boolean generateTests = false;
 
     @Argument(alias = "test", description = "Run all tests in outputDir, set to projectDir/src/test/java if outputDir not specified")
     protected boolean test = false;
 
     @Argument(alias = "classNumber", description = "Number of classes to generate EvoSuite tests for, used for debugging purposes")
-    protected Integer classNumber = 0; 
+    protected Integer classNumber = 0;
 
     @Argument(alias = "seed", description = "Random seed for test case generation, set to 88 by default")
     protected String seed = "88"; // random seed, need this to get deterministic results
 
     @Argument(alias = "maxStatements", description = "Search budget for test case generation, set to 50000 statements by default")
     protected String search_budget = "50000"; // search budget for MaxStatements stopping condition
+
+    @Argument(alias = "criterion", description = "Criterion for test generation. Set to line by default")
+    protected String criterion = "line"; // coverage goal for test generation
+
+    @Argument(alias = "output_variables", description = "Output variables for test report")
+    protected String output_variables = "TARGET_CLASS,criterion,Size,Length,MutationScore,Coverage,Fitness,Total_Time"; // coverage goal for test generation
 
     private Project project;
 
@@ -118,24 +124,24 @@ public class TestCaseGenerator {
         if (this.mavenHome != null) {
             project.setMavenHome(this.mavenHome);
         }
-        this.projectCP = project.classpath(); 
+        this.projectCP = project.classpath();
 
         // Set up output directory for tests
 
-        if (outputDir == null) { 
-                setOutputDir(); 
+        if (outputDir == null) {
+                setOutputDir();
         } else {
                 checkIfRewrite = true;
         }
 
-        if (removeTests) { 
-        
+        if (removeTests) {
+
             Logger.info("Tests will be removed from " + outputDir.getAbsolutePath());
-            try  { 
+            try  {
                 cleanOutputDir(outputDir);
             } catch (IOException e) {
                 Logger.error("IO Exception encountered while cleaning the test output directory: "+e);
-                System.exit(-1);        
+                System.exit(-1);
             }
             Logger.info("Successfully removed tests from " + outputDir.getAbsolutePath());
 
@@ -147,25 +153,25 @@ public class TestCaseGenerator {
 
                         Logger.info("Path to evosuite jar is required for test case generation, can be found in gin/testgeneration");
                         System.exit(0);
-                
+
                 }
 
                 if ((classNames == null ) && (projectTarget == null)) {
                         Logger.info("classNames or projectTarget (i.e. jar or class directory) parameter needs to be set. Exiting.");
                         System.exit(0);
-                } 
+                }
 
                 runAllUnitTests();
-        
+
                 if (classNames == null && projectTarget != null) { classNames = gatherAllClasses(); }
-        
+
                 // for debugging purposes
                 if (classNumber > 0) {
                         classNames = Arrays.copyOfRange(classNames, 0, classNumber);
                 }
 
                 if (classNames != null) {
-                    generate(classNames); 
+                    generate(classNames);
                 } else {
                         Logger.error("Tests not generated as no class names were found.");
                         System.exit(-1);
@@ -177,13 +183,103 @@ public class TestCaseGenerator {
                 Logger.info("Running all tests from " + outputDir.getAbsolutePath());
                 runAllTests();
         }
-        
+
+    }
+    //Alternate public constructor for chaining
+    public TestCaseGenerator(File projectDir, String projectName, File mavenHome, String gradleVersion,
+                             File evosuiteCP, String[] classNames, File projectTarget, File outputDir,
+                             boolean removeTests, boolean generateTests, boolean test, Integer classNumber,
+                             String seed, String search_budget, String criterion, String output_variables) {
+        this.projectDir = projectDir;
+        this.projectName = projectName;
+        this.mavenHome = mavenHome;
+        this.gradleVersion = gradleVersion;
+        this.evosuiteCP = evosuiteCP;
+        this.classNames = classNames;
+        this.projectTarget = projectTarget;
+        this.outputDir = outputDir;
+        this.removeTests = removeTests;
+        this.generateTests = generateTests;
+        this.test = test;
+        this.classNames = classNames;
+        this.seed = seed;
+        this.search_budget = search_budget;
+        this. criterion = criterion;
+        this.output_variables = output_variables;
+
+        this.project = new Project(projectDir, projectName);
+
+        if (this.gradleVersion != null) {
+            project.setGradleVersion(this.gradleVersion);
+        }
+        if (this.mavenHome != null) {
+            project.setMavenHome(this.mavenHome);
+        }
+        this.projectCP = project.classpath();
+
+        // Set up output directory for tests
+
+        if (outputDir == null) {
+            setOutputDir();
+        } else {
+            checkIfRewrite = true;
+        }
+
+        if (removeTests) {
+
+            Logger.info("Tests will be removed from " + outputDir.getAbsolutePath());
+            try  {
+                cleanOutputDir(outputDir);
+            } catch (IOException e) {
+                Logger.error("IO Exception encountered while cleaning the test output directory: "+e);
+                System.exit(-1);
+            }
+            Logger.info("Successfully removed tests from " + outputDir.getAbsolutePath());
+
+        }
+
+        if (generateTests) {
+
+            if (!evosuiteCP.isFile()) {
+
+                Logger.info("Path to evosuite jar is required for test case generation, can be found in gin/testgeneration");
+                System.exit(0);
+
+            }
+
+            if ((classNames == null ) && (projectTarget == null)) {
+                Logger.info("classNames or projectTarget (i.e. jar or class directory) parameter needs to be set. Exiting.");
+                System.exit(0);
+            }
+
+            runAllUnitTests();
+
+            if (classNames == null && projectTarget != null) { classNames = gatherAllClasses(); }
+
+            // for debugging purposes
+            if (classNumber > 0) {
+                classNames = Arrays.copyOfRange(classNames, 0, classNumber);
+            }
+
+            if (classNames != null) {
+                generate(classNames);
+            } else {
+                Logger.error("Tests not generated as no class names were found.");
+                System.exit(-1);
+            }
+        }
+
+        if (test) {
+
+            Logger.info("Running all tests from " + outputDir.getAbsolutePath());
+            runAllTests();
+        }
     }
 
     public static void main(String args[]) {
 
         TestCaseGenerator evotestgen = new TestCaseGenerator(args);
-        
+
     }
 
     private void setOutputDir() {
@@ -191,7 +287,7 @@ public class TestCaseGenerator {
         File srcDir = new File(projectDir, "src");
         File testDir = new File(srcDir, "test");
         File javaDir = new File(testDir, "java");
-        
+
         if (javaDir.isDirectory()) {
 
             this.outputDir = javaDir;
@@ -221,11 +317,11 @@ public class TestCaseGenerator {
 
     private String[] gatherAllClasses() {
 
-                List<String> allClasses = new ArrayList<String>(); 
+                List<String> allClasses = new ArrayList<String>();
 
-                String[] cmd = {"java", "-jar", evosuiteCP.getAbsolutePath() 
-                                    , "-listClasses" 
-                                    , "-target" 
+                String[] cmd = {"java", "-jar", evosuiteCP.getAbsolutePath()
+                                    , "-listClasses"
+                                    , "-target"
                                     , projectTarget.getAbsolutePath()
                                     };
 
@@ -260,8 +356,8 @@ public class TestCaseGenerator {
 
         String[] cmd = {"java", "-jar" , evosuiteCP.getAbsolutePath()
                         , "-projectCP", projectCP
-                        , "-class" , "ClassName" 
-                        , "-seed" , seed                 
+                        , "-class" , "ClassName"
+                        , "-seed" , seed
                         , "-Dtest_dir=" + outputDir.getAbsolutePath()
                         //, "-Dreport_dir=" + projectDir.getAbsolutePath() + File.separator + report_dir
                         , "-Dp_functional_mocking=" + p_functional_mocking
@@ -270,11 +366,13 @@ public class TestCaseGenerator {
                         , "-Dsearch_budget=" + search_budget
                         , "-Duse_separate_classloader=" + use_separate_classloader
                         , "-Dfilter_assertions=" + filter_assertions
+                        , "-Dcriterion=" + criterion
+                        , "-Doutput_variables=" + output_variables
                         //, "-Dsandbox_mode=" + sandbox_mode
                         //, "-Dminimize=" + minimize
                         //, "-Dassertion_minimization_fallback_time=" + assertion_minimization_fallback_time
                         };
-                
+
         for (String className : classNames) {
 
                 //if new File(projectCPclassName
@@ -288,7 +386,7 @@ public class TestCaseGenerator {
                                                  .redirectError(Slf4jStream.ofCaller().asInfo())
                                             .destroyOnExit() // Destroy the process when VM exits
                                             .execute();
-                
+
                 } catch (IOException e){
                         Logger.error("IO Exception encountered when generating EvoSuite tests: " + e);
                 } catch (InterruptedException e){
@@ -298,7 +396,7 @@ public class TestCaseGenerator {
                 }
 
         }
-        
+
     }
 
     private void runAllTests() {
@@ -345,7 +443,7 @@ public class TestCaseGenerator {
         }
 
         Build mbuild = model.getBuild();
-        
+
         if (checkIfRewrite) {
             mbuild.setTestSourceDirectory(outputDir.getPath());
             model.setBuild(mbuild);
@@ -367,8 +465,8 @@ public class TestCaseGenerator {
 
         if ( check == false ) {
             model.addDependency(dependency);
-        } 
-        
+        }
+
         MavenXpp3Writer mavenwriter = new MavenXpp3Writer();
         try {
             FileOutputStream writer = new FileOutputStream(new File(projectDir.toString(), File.separator + "pom.xml"));

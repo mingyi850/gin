@@ -81,6 +81,36 @@ public class LocalSearch {
 
     }
 
+    //Alternate public constructor for chaining
+    public LocalSearch(File filename, String methodSignature, Integer seed, Integer numSteps, File packageDir, String className, String classPath, String testClassName) {
+        this.filename = filename;
+        this.methodSignature = methodSignature;
+        this.seed = seed;
+        this.numSteps = numSteps;
+        this.packageDir = packageDir;
+        this.className = className;
+        this.classPath = classPath;
+        this.testClassName = testClassName;
+
+        this.sourceFile = new SourceFileLine(this.filename, this.methodSignature);
+        this.rng = new Random(seed);
+        if (this.packageDir == null) {
+            this.packageDir = this.filename.getParentFile().getAbsoluteFile();
+        }
+        if (this.classPath == null) {
+            this.classPath = this.packageDir.getAbsolutePath();
+        }
+        if (this.className == null) {
+            System.out.println("Null className");
+            this.className = FilenameUtils.removeExtension(this.filename.getName());
+            System.out.println("New classname is : " + this.className);
+        }
+        if (this.testClassName == null) {
+            this.testClassName = this.className + "Test";
+        }
+        this.testRunner = new InternalTestRunner(this.className, this.classPath, this.testClassName);
+    }
+
     // Apply empty patch and return execution time
     private long timeOriginalCode() {
 
@@ -112,7 +142,7 @@ public class LocalSearch {
     }
 
     // Simple local search
-    private void search() {
+    public void search() {
 
         Logger.info(String.format("Localsearch on file: %s method: %s", filename, methodSignature));
 
@@ -155,7 +185,54 @@ public class LocalSearch {
                                     bestPatch));
 
         bestPatch.writePatchedSourceToFile(sourceFile.getFilename() + ".optimised");
+        bestPatch.writePatchStringToFile("bestpatch.txt");
+    }
 
+    public String getPatchFromSearch() {
+
+        Logger.info(String.format("Localsearch on file: %s method: %s", filename, methodSignature));
+
+        // Time original code
+        long origTime = timeOriginalCode();
+        Logger.info("Original execution time: " + origTime + "ns");
+
+        // Start with empty patch
+        Patch bestPatch = new Patch(this.sourceFile);
+        long bestTime = origTime;
+
+        for (int step = 1; step <= numSteps; step++) {
+
+            Patch neighbour = neighbour(bestPatch);
+            UnitTestResultSet testResultSet = testRunner.runTests(neighbour, 1);
+
+            String msg;
+
+            if (!testResultSet.getValidPatch()) {
+                msg = "Patch invalid";
+            } else if (!testResultSet.getCleanCompile()) {
+                msg = "Failed to compile";
+            } else if (!testResultSet.allTestsSuccessful()) {
+                msg = ("Failed to pass all tests");
+            } else if (testResultSet.totalExecutionTime() >= bestTime) {
+                msg = "Time: " + testResultSet.totalExecutionTime() + "ns";
+            } else {
+                bestPatch = neighbour;
+                bestTime = testResultSet.totalExecutionTime();
+                msg = "New best time: " + bestTime + "(ns)";
+            }
+
+            Logger.info(String.format("Step: %d, Patch: %s, %s ", step, neighbour, msg));
+
+        }
+
+        Logger.info(String.format("Finished. Best time: %d (ns), Speedup (%%): %.2f, Patch: %s",
+                bestTime,
+                100.0f *((origTime - bestTime)/(1.0f * origTime)),
+                bestPatch));
+
+        bestPatch.writePatchedSourceToFile(sourceFile.getFilename() + ".optimised");
+        bestPatch.writePatchStringToFile("bestpatch.txt");
+        return bestPatch.toString();
     }
 
 
@@ -173,7 +250,7 @@ public class LocalSearch {
         } else {
             neighbour.addRandomEdit(rng, Collections.singletonList(Edit.EditType.LINE));
         }
-        
+
         return neighbour;
 
     }
