@@ -188,40 +188,20 @@ public class Experiment {
         String patchText = simpleLocalSearch.getPatchFromSearch();
 
 
-        /*BufferedReader input = null;
-        String patchText = "|";
-        try {
-            input = new BufferedReader(new FileReader(new File("bestpatch.txt")));
-            patchText = input.readLine();
-        }
-        catch (IOException e){
-            e.printStackTrace();
-            System.out.println("Unable to get line, terminating program for file safety");
-            System.exit(1);
-        }
-        finally {
-            try {
-                if (input != null) {
-                    input.close();
-                }
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-
-        }
-        */
         return patchText;
     }
 
     public List<String> getPatchAnalysis() {
         String patchTrim = patchText.trim();
-        if (patchTrim != "|") {
+        System.out.println("PatchTrim: " + patchTrim);
+        System.out.println("PatchTrimLength: " + patchTrim.length());
+        if (patchTrim.length() > 1) {
+            System.out.println("Patch trim is legit");
             PatchAnalyser analyser = new PatchAnalyser(filename, patchText, projectDir, className, classPath, oracleTestClassName);
             return analyser.getAnalysisResults();
         }
         else {
+            System.out.println("Returning empty patch analysis");
             List<String> nullPatchList = new ArrayList<String>();
             nullPatchList.add(patchText);
             nullPatchList.add(Boolean.toString(false));
@@ -340,7 +320,9 @@ public class Experiment {
 
             this_experiment.patchText = this_experiment.getLocalSearchPatch(currentGinSeed);
             System.out.println(this_experiment.patchText);
+
             List<String> patchAnalysisResults = this_experiment.getPatchAnalysis();
+
 
             ArrayList<String> dataEntry = new ArrayList<String>();
             dataEntry.add(Integer.toString(iteration + 1));
@@ -353,6 +335,7 @@ public class Experiment {
                 dataEntry.add(patchAnalysisResults.get(p));
             }
             this_experiment.writeResult(dataEntry);
+
 
         }
 

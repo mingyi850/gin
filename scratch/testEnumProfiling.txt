@@ -1,6 +1,6 @@
-2020-02-12 12:14:00 [Test worker] gin.util.Project.getMethodSignature()
+2020-02-12 15:42:45 [Test worker] gin.util.Project.getMethodSignature()
 WARNING: Could not find source for method: example.ExampleEnum.values line: 6
-2020-02-12 12:14:00 [Test worker] gin.util.Trace.cleanMethodCounts()
+2020-02-12 15:42:45 [Test worker] gin.util.Trace.cleanMethodCounts()
 WARNING: Excluding method as class in main tree but method not found: example.ExampleEnum.values:6
-2020-02-12 12:14:00 [Test worker] gin.util.Trace.cleanMethodCounts()
+2020-02-12 15:42:45 [Test worker] gin.util.Trace.cleanMethodCounts()
 WARNING: This is likely because the method relates to an enum type.
