@@ -182,16 +182,68 @@ public class Experiment {
                 cSeed, this.search_budget, currentCriterion, this.output_variables);
     }
 
-    private String getLocalSearchPatch(Integer currentSeed) {
+    private String getLocalSearchPatch(Integer currentSeed, Boolean oracleTest) {
         System.out.println(this.className);
-        LocalSearch simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, className, classPath, testClassName);
+        LocalSearch simpleLocalSearch;
+        if (oracleTest == false) {
+            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, className, classPath, testClassName);
+        }
+        else {
+            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, className, classPath, oracleTestClassName);
+        }
         String patchText = simpleLocalSearch.getPatchFromSearch();
 
 
         return patchText;
     }
 
-    public List<String> getPatchAnalysis() {
+    private List<String> getBestLocalSearchPatch(Integer currentSeed, Integer iterations, Boolean oracleTest) {
+
+        List<HashMap<String,String>> patchResults = new ArrayList<HashMap<String,String>>();
+        HashMap<String, String> patchAnalysisResult;
+        for (int iter=0;iter<iterations;iter++) {
+            this.patchText = getLocalSearchPatch(currentSeed + iter, false);
+
+             patchAnalysisResult = getPatchAnalysis();
+             patchResults.add(patchAnalysisResult);
+
+
+
+        }
+
+        int bestSpeedupIndex = 0;
+        Float bestSpeedupTime = 0.0f;
+        Float speeduptime;
+        Boolean validity;
+        Boolean success;
+        for (int x = 0; x < iterations; x++) {
+            speeduptime = Float.parseFloat(patchResults.get(x).get("speedup"));
+            validity = Boolean.parseBoolean(patchResults.get(x).get("validpatch"));
+            success = Boolean.parseBoolean(patchResults.get(x).get("success"));
+            if (speeduptime > bestSpeedupTime && validity && success) {
+                bestSpeedupTime = speeduptime;
+                bestSpeedupIndex = x;
+            }
+        }
+        HashMap<String, String> bestPatch = patchResults.get(bestSpeedupIndex);
+        return parsePatchResult(bestPatch);
+
+    }
+
+    private List<String> parsePatchResult(HashMap<String, String> bestPatch) {
+        List<String> finalResults = new ArrayList<String>();
+        finalResults.add(bestPatch.get("patch"));
+        finalResults.add(bestPatch.get("validpatch"));
+        finalResults.add(bestPatch.get("success"));
+        finalResults.add(bestPatch.get("avgtime"));
+        finalResults.add(bestPatch.get("speedup"));
+        return finalResults;
+
+    }
+
+
+
+    public HashMap<String, String> getPatchAnalysis() {
         String patchTrim = patchText.trim();
         System.out.println("PatchTrim: " + patchTrim);
         System.out.println("PatchTrimLength: " + patchTrim.length());
@@ -202,12 +254,12 @@ public class Experiment {
         }
         else {
             System.out.println("Returning empty patch analysis");
-            List<String> nullPatchList = new ArrayList<String>();
-            nullPatchList.add(patchText);
-            nullPatchList.add(Boolean.toString(false));
-            nullPatchList.add(Boolean.toString(true));
-            nullPatchList.add(Long.toString(0));
-            nullPatchList.add(Float.toString(0));
+            HashMap<String, String> nullPatchList = new HashMap<String, String>();
+            nullPatchList.put("patch", patchText);
+            nullPatchList.put("validpatch", Boolean.toString(false));
+            nullPatchList.put("success", Boolean.toString(true));
+            nullPatchList.put("avgtime", Long.toString(0));
+            nullPatchList.put("speedup", Float.toString(0));
             return nullPatchList;
         }
 
@@ -295,15 +347,29 @@ public class Experiment {
         }
     }
 
+    public List<String> generateManualTestStatistics() {
+        List<String> testStatistics = new ArrayList<String>();
+        testStatistics.add(this.classNames[0]);
+        testStatistics.add("MANUAL");
+        testStatistics.add("");
+        testStatistics.add("");
+        testStatistics.add("");
+        testStatistics.add("");
+        testStatistics.add("");
+        testStatistics.add("0");
+        return testStatistics;
+    }
+
     public static void main(String[] args) {
 
         Random seedGen = new Random();
         Experiment this_experiment = new Experiment(args);
         System.out.println("Total iterations: " +this_experiment.totalIterations);
         this_experiment.writeExperimentHeader();
-        int currentEvoSeed;
-        int currentGinSeed;
+        int currentEvoSeed=88;
+        int currentGinSeed=12;
         String currentCriterion;
+        int currentIteration=0;
         for (int iteration=0; iteration < this_experiment.totalIterations; iteration++) {
             currentEvoSeed = seedGen.nextInt(100);
             seedGen.setSeed(currentEvoSeed);
@@ -317,11 +383,7 @@ public class Experiment {
             File testStatisticsFile = new File("evosuite-report/statistics.csv");
             List<String> testStatistics = readLastLine(testStatisticsFile);
 
-
-            this_experiment.patchText = this_experiment.getLocalSearchPatch(currentGinSeed);
-            System.out.println(this_experiment.patchText);
-
-            List<String> patchAnalysisResults = this_experiment.getPatchAnalysis();
+            List<String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 3, false);
 
 
             ArrayList<String> dataEntry = new ArrayList<String>();
@@ -335,9 +397,29 @@ public class Experiment {
                 dataEntry.add(patchAnalysisResults.get(p));
             }
             this_experiment.writeResult(dataEntry);
-
+            currentIteration++; //global counter for iterations
 
         }
+        //Additional Patch using manually written Test (oracle)
+        List<String> manualTestStatistics = this_experiment.generateManualTestStatistics();
+
+        this_experiment.patchText = this_experiment.getLocalSearchPatch(currentGinSeed, true);
+        System.out.println(this_experiment.patchText);
+
+        List<String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 3, true);
+
+        ArrayList<String> dataEntry = new ArrayList<String>();
+        dataEntry.add(Integer.toString(currentIteration + 1));
+        for (int t=0;t<manualTestStatistics.size();t++) {
+            dataEntry.add(manualTestStatistics.get(t));
+        }
+        dataEntry.add(Integer.toString(0));
+        dataEntry.add(Integer.toString(currentGinSeed));
+        for (int p=0;p<patchAnalysisResults.size();p++) {
+            dataEntry.add(patchAnalysisResults.get(p));
+        }
+        this_experiment.writeResult(dataEntry);
+
 
 
 

@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import gin.edit.Edit;
@@ -180,7 +181,7 @@ public class PatchAnalyser {
 
     }
 
-    public List<String> getAnalysisResults() {
+    public HashMap<String,String> getAnalysisResults() {
         // Create SourceFile and tester classes, parse the patch and generate patched source.
         SourceFileLine sourceFileLine = new SourceFileLine(source.getAbsolutePath(), null);
         SourceFileTree sourceFileTree = new SourceFileTree(source.getAbsolutePath(), null);
@@ -254,12 +255,12 @@ public class PatchAnalyser {
         long averageExecutionTime = resultSet.totalExecutionTime() / REPS;
 
 
-        ArrayList<String> analysisResults = new ArrayList<String>();
-        analysisResults.add(patchText);
-        analysisResults.add(Boolean.toString(resultSet.getValidPatch()));
-        analysisResults.add(Boolean.toString(resultSet.allTestsSuccessful()));
-        analysisResults.add(Long.toString(averageExecutionTime));
-        analysisResults.add(Float.toString(speedup));
+        HashMap<String, String> analysisResults = new HashMap<String,String>();
+        analysisResults.put("patch", patchText);
+        analysisResults.put("validpatch", Boolean.toString(resultSet.getValidPatch()));
+        analysisResults.put("success", Boolean.toString(resultSet.allTestsSuccessful()));
+        analysisResults.put("avgtime", Long.toString(averageExecutionTime));
+        analysisResults.put("speedup", Float.toString(speedup));
         return analysisResults;
 
 

@@ -85,11 +85,13 @@ public class TestCaseGenerator {
     protected String criterion = "line"; // coverage goal for test generation
 
     @Argument(alias = "output_variables", description = "Output variables for test report")
-    protected String output_variables = "TARGET_CLASS,criterion,Size,Length,MutationScore,Coverage,Fitness,Total_Time"; // coverage goal for test generation
+    protected String output_variables = "TARGET_CLASS,criterion,Size,Length,Coverage,Fitness,Total_Time"; // coverage goal for test generation
 
     private Project project;
 
     private boolean checkIfRewrite = false;
+
+    protected String assertion_strategy = "ALL";
 
     // EvoSuite parameters
 
@@ -368,6 +370,7 @@ public class TestCaseGenerator {
                         , "-Dfilter_assertions=" + filter_assertions
                         , "-Dcriterion=" + criterion
                         , "-Doutput_variables=" + output_variables
+                        , "-Dassertion_strategy=" + assertion_strategy
                         //, "-Dsandbox_mode=" + sandbox_mode
                         //, "-Dminimize=" + minimize
                         //, "-Dassertion_minimization_fallback_time=" + assertion_minimization_fallback_time
