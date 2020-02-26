@@ -92,7 +92,7 @@ public class Experiment {
     protected String[]  criterion_list = {};
 
     @Argument(alias = "output_variables", description = "Output variables for test report")
-    protected String output_variables = "TARGET_CLASS,criterion,Size,Length,MutationScore,Coverage,Fitness,Total_Time"; // coverage goal for test generation
+    protected String output_variables = "TARGET_CLASS,criterion,Size,Length,Coverage,Fitness,Total_Time"; // coverage goal for test generation
 
     // Local Search Variables
     @Argument(alias = "f", description = "Required: Source filename", required=true)
@@ -134,8 +134,7 @@ public class Experiment {
     //Utility Variables
     protected String[] EXPERIMENT_HEADER = {"Index", "target class",
             "criterion", "test_size",
-            "test_length", "mutation_score",
-            "coverage", "fitness",
+            "test_length", "coverage", "fitness",
             "total_testgen_time", "evo_seed",
             "gin_seed", "patch_text",
             "valid_patch", "all_tests_passed",
@@ -351,7 +350,6 @@ public class Experiment {
         List<String> testStatistics = new ArrayList<String>();
         testStatistics.add(this.classNames[0]);
         testStatistics.add("MANUAL");
-        testStatistics.add("");
         testStatistics.add("");
         testStatistics.add("");
         testStatistics.add("");
