@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.mycompany.app.AppTest" time="16.047" tests="5" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.mycompany.app.AppTest" time="1.65" tests="5" errors="0" skipped="0" failures="0">
   <properties>
     <property name="sun.desktop" value="windows"/>
     <property name="awt.toolkit" value="sun.awt.windows.WToolkit"/>
@@ -7,7 +7,7 @@
     <property name="java.specification.version" value="1.8"/>
     <property name="sun.cpu.isalist" value="amd64"/>
     <property name="sun.jnu.encoding" value="Cp1252"/>
-    <property name="java.class.path" value="C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-master\examples\maven-simple\target\test-classes;C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-master\examples\maven-simple\target\classes;C:\Users\Admin\.m2\repository\junit\junit\4.11\junit-4.11.jar;C:\Users\Admin\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\Admin\.m2\repository\org\evosuite\evosuite-standalone-runtime\1.0.6\evosuite-standalone-runtime-1.0.6.jar;"/>
+    <property name="java.class.path" value="C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-fork\examples\maven-simple\target\test-classes;C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-fork\examples\maven-simple\target\classes;C:\Users\Admin\.m2\repository\junit\junit\4.11\junit-4.11.jar;C:\Users\Admin\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\Admin\.m2\repository\org\evosuite\evosuite-standalone-runtime\1.0.6\evosuite-standalone-runtime-1.0.6.jar;"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="user.variant" value=""/>
@@ -18,20 +18,20 @@
     <property name="user.country" value="SG"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.8.0_161\jre\bin"/>
-    <property name="sun.java.command" value="C:\Users\Admin\AppData\Local\Temp\surefire5609583336239817476\surefirebooter887579591291049139.jar C:\Users\Admin\AppData\Local\Temp\surefire5609583336239817476 2020-01-24T15-43-38_247-jvmRun1 surefire6386454929922954399tmp surefire_01403267891375679468tmp"/>
-    <property name="surefire.test.class.path" value="C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-master\examples\maven-simple\target\test-classes;C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-master\examples\maven-simple\target\classes;C:\Users\Admin\.m2\repository\junit\junit\4.11\junit-4.11.jar;C:\Users\Admin\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\Admin\.m2\repository\org\evosuite\evosuite-standalone-runtime\1.0.6\evosuite-standalone-runtime-1.0.6.jar;"/>
+    <property name="sun.java.command" value="C:\Users\Admin\AppData\Local\Temp\surefire5241514243977960183\surefirebooter6461304910860361363.jar C:\Users\Admin\AppData\Local\Temp\surefire5241514243977960183 2020-03-03T00-48-32_387-jvmRun1 surefire345670392839357957tmp surefire_01754824846845009146tmp"/>
+    <property name="surefire.test.class.path" value="C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-fork\examples\maven-simple\target\test-classes;C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-fork\examples\maven-simple\target\classes;C:\Users\Admin\.m2\repository\junit\junit\4.11\junit-4.11.jar;C:\Users\Admin\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\Admin\.m2\repository\org\evosuite\evosuite-standalone-runtime\1.0.6\evosuite-standalone-runtime-1.0.6.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="C:\Users\Admin"/>
     <property name="user.language" value="en"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="java.home" value="C:\Program Files\Java\jdk1.8.0_161\jre"/>
-    <property name="basedir" value="C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-master\examples\maven-simple"/>
+    <property name="basedir" value="C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-fork\examples\maven-simple"/>
     <property name="file.separator" value="\"/>
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
-    <property name="surefire.real.class.path" value="C:\Users\Admin\AppData\Local\Temp\surefire5609583336239817476\surefirebooter887579591291049139.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\Admin\AppData\Local\Temp\surefire5241514243977960183\surefirebooter6461304910860361363.jar"/>
     <property name="sun.boot.class.path" value="C:\Program Files\Java\jdk1.8.0_161\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\rt.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_161\jre\classes"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
@@ -47,7 +47,7 @@
     <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
     <property name="java.io.tmpdir" value="C:\Users\Admin\AppData\Local\Temp\"/>
     <property name="java.version" value="1.8.0_161"/>
-    <property name="user.dir" value="C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-master\examples\maven-simple"/>
+    <property name="user.dir" value="C:\Users\Admin\Documents\Computer Science\Y3\Final Year Project\gin-fork\examples\maven-simple"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"/>
@@ -61,8 +61,8 @@
     <property name="java.class.version" value="52.0"/>
   </properties>
   <testcase name="shouldAnswerWithTrue" classname="com.mycompany.app.AppTest" time="0.002"/>
-  <testcase name="testScaleneTriangles" classname="com.mycompany.app.AppTest" time="4.003"/>
-  <testcase name="testEqualateralTriangles" classname="com.mycompany.app.AppTest" time="3"/>
-  <testcase name="testIsocelesTriangles" classname="com.mycompany.app.AppTest" time="4.003"/>
-  <testcase name="testInvalidTriangles" classname="com.mycompany.app.AppTest" time="5.002"/>
+  <testcase name="testScaleneTriangles" classname="com.mycompany.app.AppTest" time="0.404"/>
+  <testcase name="testEqualateralTriangles" classname="com.mycompany.app.AppTest" time="0.301"/>
+  <testcase name="testIsocelesTriangles" classname="com.mycompany.app.AppTest" time="0.402"/>
+  <testcase name="testInvalidTriangles" classname="com.mycompany.app.AppTest" time="0.502"/>
 </testsuite>

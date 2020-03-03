@@ -108,8 +108,8 @@ public class Experiment {
     @Argument(alias = "n", description = "Number of steps")
     protected Integer numSteps = 100;
 
-    @Argument(alias = "c", description = "Class name")
-    protected String className;
+    /*@Argument(alias = "c", description = "Class name")
+    protected String className;*/ //Not in use. Use classNames[0] instead
 
     @Argument(alias = "cp", description = "Classpath")
     protected String classPath;
@@ -182,13 +182,13 @@ public class Experiment {
     }
 
     private String getLocalSearchPatch(Integer currentSeed, Boolean oracleTest) {
-        System.out.println(this.className);
+        System.out.println(this.classNames[0]);
         LocalSearch simpleLocalSearch;
         if (oracleTest == false) {
-            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, className, classPath, testClassName);
+            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, testClassName);
         }
         else {
-            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, className, classPath, oracleTestClassName);
+            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, oracleTestClassName);
         }
         String patchText = simpleLocalSearch.getPatchFromSearch();
 
@@ -248,7 +248,7 @@ public class Experiment {
         System.out.println("PatchTrimLength: " + patchTrim.length());
         if (patchTrim.length() > 1) {
             System.out.println("Patch trim is legit");
-            PatchAnalyser analyser = new PatchAnalyser(filename, patchText, projectDir, className, classPath, oracleTestClassName);
+            PatchAnalyser analyser = new PatchAnalyser(filename, patchText, projectDir, classNames[0], classPath, oracleTestClassName);
             return analyser.getAnalysisResults();
         }
         else {

@@ -54,7 +54,7 @@ public class App
     private static void delay() {
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
 
         }
