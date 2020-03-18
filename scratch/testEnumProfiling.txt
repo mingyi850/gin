@@ -1,4 +1,0 @@
-2020-03-03 00:47:56 [Test worker] gin.test.InternalTestRunner.runSingleTest()
-WARNING: Possible hanging threads remain after test
-2020-03-03 00:47:56 [Test worker] gin.test.InternalTestRunner.runSingleTest()
-WARNING: Possible hanging threads remain after test

@@ -402,7 +402,7 @@ public class TestCaseGenerator {
 
     }
 
-    private void runAllTests() {
+    protected void runAllTests() {
 
         if (project.getBuildType() == Project.BuildType.MAVEN) {
             updatePom();

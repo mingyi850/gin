@@ -7,6 +7,7 @@ import com.sampullara.cli.Args;
 import gin.LocalSearch;
 import gin.Patch;
 import gin.PatchAnalyser;
+import gin.test.TestSampler;
 import org.apache.commons.lang3.ObjectUtils;
 import org.pmw.tinylog.Logger;
 
@@ -92,7 +93,7 @@ public class Experiment {
     protected String[]  criterion_list = {};
 
     @Argument(alias = "output_variables", description = "Output variables for test report")
-    protected String output_variables = "TARGET_CLASS,criterion,Size,Length,Coverage,Fitness,Total_Time"; // coverage goal for test generation
+    protected String output_variables = "TARGET_CLASS,criterion,Size,Length,Fitness,Total_Time"; // coverage goal for test generation
 
     // Local Search Variables
     @Argument(alias = "f", description = "Required: Source filename", required=true)
@@ -116,7 +117,12 @@ public class Experiment {
 
     //Exclusive parameter for patchAnalyser. Also requires Patch
     @Argument(alias = "t", description = "Test class name")
-    protected String testClassName;
+    protected String testClassName = "";
+
+    //TestSampler required
+    @Argument(alias = "evoTestSource", description = "Path to generated evosuite tests")
+    protected File evoTestSource;
+
 
     @Argument(alias = "oracle", description = "Oracle test class name. Test Class used to compare patch")
     protected String oracleTestClassName;
@@ -128,18 +134,28 @@ public class Experiment {
 
     protected String patchText = "|";
 
+    protected TestSampler testsampler;
+
+    protected TestCaseGenerator testCaseGen;
+
+    String sampledClassName;
+
     @Argument(alias = "of", description = "Output File")
     protected File outputFile;
 
     //Utility Variables
-    protected String[] EXPERIMENT_HEADER = {"Index", "target class",
-            "criterion", "test_size",
-            "test_length", "coverage", "fitness",
-            "total_testgen_time", "evo_seed",
+    protected String[] EXPERIMENT_HEADER = {"Index", "TARGET_CLASS",
+            "Criterion", "Size",
+            "Length", "Fitness",
+            "Total_Time", "evo_seed",
             "gin_seed", "patch_text",
             "valid_patch", "all_tests_passed",
             "execution_time", "speedup(%)"
     };
+
+    protected String[] gin_headers = {"patch", "validpatch", "success", "avgtime","speedup"};
+
+    private String[] evoOutputVariablesList;
 
 
 
@@ -158,6 +174,7 @@ public class Experiment {
 
         }
         for (int x =0;x<criterion_list.length;x++) {
+            criterion_list[x] = criterion_list[x].toUpperCase();
             System.out.println("Criterion list: " + criterion_list[x]);
         }
         this.totalIterations = iterations * this.criterion_list.length;
@@ -167,9 +184,38 @@ public class Experiment {
             outputFile = new File(String.format("experiment-results/experiment_results_%s_%d_iter_%s.csv", this.projectName, iterations, datestring));
         }
 
+        this.evoOutputVariablesList = output_variables.split(",");
+        initialiseExperimentHeader();
+        sampledClassName = this.testClassName + "_SAMPLED";
 
 
 
+
+    }
+
+    public String[] getEvoOutputVariablesList() {
+        return evoOutputVariablesList;
+    }
+
+    public void initialiseExperimentHeader() {
+        ArrayList<String> headers = new ArrayList<String>();
+        headers.add("Index");
+        Collections.addAll(headers, evoOutputVariablesList);
+        headers.add("evo_seed");
+        for (int x=0; x< criterion_list.length; x++) {
+            headers.add(criterion_list[x] + "_Coverage");
+        }
+        headers.add("gin_seed");
+        Collections.addAll(headers, gin_headers);
+        String[] a = {"dummy"};
+        EXPERIMENT_HEADER = headers.toArray(a);
+        printArr(EXPERIMENT_HEADER);
+    }
+
+    private static void printArr(String[] arr) {
+        for (int x = 0; x < arr.length; x++) {
+            System.out.println(arr[x]);
+        }
     }
 
     private void generateEvosuiteTests(String currentCriterion, int currentSeed) {
@@ -179,14 +225,21 @@ public class Experiment {
                 this.evosuiteCP, this.classNames, this.projectTarget, this.outputDir,
                 this.removeTests,  this.generateTests, this.test, this.classNumber,
                 cSeed, this.search_budget, currentCriterion, this.output_variables);
+        this.testCaseGen = testCaseGen;
     }
 
-    private String getLocalSearchPatch(Integer currentSeed, Boolean oracleTest) {
+    private String getLocalSearchPatch(Integer currentSeed, Boolean oracleTest, boolean sampleTest) {
         System.out.println(this.classNames[0]);
         LocalSearch simpleLocalSearch;
         if (oracleTest == false) {
-            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, testClassName);
+            if (sampleTest == false) {
+                simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, testClassName);
+            }
+            else {
+                simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, sampledClassName);
+            }
         }
+
         else {
             simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, oracleTestClassName);
         }
@@ -196,12 +249,12 @@ public class Experiment {
         return patchText;
     }
 
-    private List<String> getBestLocalSearchPatch(Integer currentSeed, Integer iterations, Boolean oracleTest) {
+    private HashMap<String, String> getBestLocalSearchPatch(Integer currentSeed, Integer iterations, Boolean oracleTest, Boolean sampledTest) {
 
         List<HashMap<String,String>> patchResults = new ArrayList<HashMap<String,String>>();
         HashMap<String, String> patchAnalysisResult;
         for (int iter=0;iter<iterations;iter++) {
-            this.patchText = getLocalSearchPatch(currentSeed + iter, false);
+            this.patchText = getLocalSearchPatch(currentSeed + iter, oracleTest, sampledTest);
 
              patchAnalysisResult = getPatchAnalysis();
              patchResults.add(patchAnalysisResult);
@@ -225,8 +278,26 @@ public class Experiment {
             }
         }
         HashMap<String, String> bestPatch = patchResults.get(bestSpeedupIndex);
-        return parsePatchResult(bestPatch);
+        return bestPatch;
 
+    }
+
+    private HashMap<String, String> getTestCoverageResults(boolean oracle, boolean sampled) {
+        String testClass;
+
+        if (oracle) {
+            testClass = oracleTestClassName;
+        }
+        else {
+            if (sampled) {
+                testClass = sampledClassName;
+            }
+            testClass = testClassName;
+        }
+        CoverageMeasurer measurer = new CoverageMeasurer(classNames[0], String.join(":",criterion_list), evosuiteCP, new File(classPath), testClass);
+        String coverageOutput = measurer.measureCoverage();
+        HashMap<String, String> outputMap = measurer.parseOutput(coverageOutput);
+        return outputMap;
     }
 
     private List<String> parsePatchResult(HashMap<String, String> bestPatch) {
@@ -346,15 +417,16 @@ public class Experiment {
         }
     }
 
-    public List<String> generateManualTestStatistics() {
-        List<String> testStatistics = new ArrayList<String>();
-        testStatistics.add(this.classNames[0]);
-        testStatistics.add("MANUAL");
-        testStatistics.add("");
-        testStatistics.add("");
-        testStatistics.add("");
-        testStatistics.add("");
-        testStatistics.add("0");
+    public HashMap<String,String> generateManualTestStatistics() {
+        //"TARGET_CLASS,criterion,Size,Length,Fitness,Total_Time"
+        HashMap<String, String> testStatistics = new HashMap<String, String>();
+        testStatistics.put("TARGET_CLASS", this.classNames[0]);
+        testStatistics.put("criterion", "MANUAL");
+        testStatistics.put("Size", "");
+        testStatistics.put("Length", "0");
+        testStatistics.put("Fitness", "0");
+        testStatistics.put("Total_Time", "0");
+        testStatistics.putAll(getTestCoverageResults(true, false));
         return testStatistics;
     }
 
@@ -362,59 +434,96 @@ public class Experiment {
 
         Random seedGen = new Random();
         Experiment this_experiment = new Experiment(args);
+        System.out.println("evoTestSource: " + this_experiment.evoTestSource.getPath());
         System.out.println("Total iterations: " +this_experiment.totalIterations);
         this_experiment.writeExperimentHeader();
         int currentEvoSeed=88;
         int currentGinSeed=12;
         String currentCriterion;
         int currentIteration=0;
+        HashMap<String, String> experimentResults;
+        String[] evoOutputHeaders = this_experiment.getEvoOutputVariablesList();
+        String[] headers = this_experiment.EXPERIMENT_HEADER;
+
         for (int iteration=0; iteration < this_experiment.totalIterations; iteration++) {
+            experimentResults = new HashMap<String, String>();
+            experimentResults.put("Index", Integer.toString(iteration + 1));
             currentEvoSeed = seedGen.nextInt(100);
             seedGen.setSeed(currentEvoSeed);
             currentGinSeed = seedGen.nextInt(100);
+            experimentResults.put("gin_seed", Integer.toString(currentGinSeed));
+            experimentResults.put("evo_seed", Integer.toString(currentEvoSeed));
 
             currentCriterion = this_experiment.criterion_list[Math.floorDiv(iteration, this_experiment.iterations)];
             System.out.println("current Iteration is " + iteration);
             System.out.println("current Criterion is " + currentCriterion);
 
+            // End of admin: Test Generation Starts
             this_experiment.generateEvosuiteTests(currentCriterion, currentEvoSeed);
             File testStatisticsFile = new File("evosuite-report/statistics.csv");
             List<String> testStatistics = readLastLine(testStatisticsFile);
+            System.out.println("End of test generation");
 
-            List<String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 3, false);
+            //read testStatistics into HashMap
 
-
-            ArrayList<String> dataEntry = new ArrayList<String>();
-            dataEntry.add(Integer.toString(iteration + 1));
-            for (int t=0;t<testStatistics.size();t++) {
-                dataEntry.add(testStatistics.get(t));
+            for (int x=0;x< evoOutputHeaders.length; x++) {
+                experimentResults.put(evoOutputHeaders[x], testStatistics.get(x));
             }
-            dataEntry.add(Integer.toString(currentEvoSeed));
-            dataEntry.add(Integer.toString(currentGinSeed));
-            for (int p=0;p<patchAnalysisResults.size();p++) {
-                dataEntry.add(patchAnalysisResults.get(p));
+            HashMap<String, String> coverageResults = this_experiment.getTestCoverageResults(false, false);
+            System.out.println("Obtained coverage results");
+
+            experimentResults.putAll(coverageResults);
+            System.out.println("Experiment Results so far: " + experimentResults.toString());
+
+            //Testsampler portion:
+            this_experiment.testsampler = new TestSampler(this_experiment.evoTestSource);
+            TestSampler sampler = this_experiment.testsampler;
+            int intervals = 4;
+            int decrement = Math.floorDiv(sampler.getTotalTests(), (intervals - 1));
+            if (decrement < 1) {
+                decrement = 1;
             }
-            this_experiment.writeResult(dataEntry);
-            currentIteration++; //global counter for iterations
+            for (int x = 0; x < intervals; x++) {
+                if (x > 0) { // don't do anything for first iteration
+                    sampler.commentOutNTests(sampler.getSampledTestFile(), decrement, currentGinSeed);
+                    this_experiment.testCaseGen.runAllTests();
+                    if (experimentResults.containsKey("Size")) {
+                        experimentResults.put("Size", String.valueOf(Integer.parseInt(experimentResults.get("Size")) - decrement));
+                    }
+                    coverageResults = this_experiment.getTestCoverageResults(false, true);
+                    experimentResults.putAll(coverageResults);
+                    System.out.println("Experiment Results so far: " + experimentResults.toString());
+
+                }
+
+                HashMap<String, String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 3, false, true);
+                experimentResults.putAll(patchAnalysisResults);
+                ArrayList<String> dataEntry = new ArrayList<String>();
+
+                for (int ind=0;ind<headers.length; ind++) {
+                    dataEntry.add(experimentResults.get(headers[ind]));
+                }
+                this_experiment.writeResult(dataEntry);
+                currentIteration++;
+            }
+
+            ; //global counter for iterations
 
         }
         //Additional Patch using manually written Test (oracle)
-        List<String> manualTestStatistics = this_experiment.generateManualTestStatistics();
+        HashMap<String, String> manualExperiment = new HashMap<String, String>();
+        HashMap<String, String> manualTestStatistics = this_experiment.generateManualTestStatistics();
+        manualExperiment.putAll(manualTestStatistics);
+        manualExperiment.put("Index", Integer.toString(currentIteration + 1));
+        this_experiment.patchText = this_experiment.getLocalSearchPatch(currentGinSeed, true, false);
 
-        this_experiment.patchText = this_experiment.getLocalSearchPatch(currentGinSeed, true);
-        System.out.println(this_experiment.patchText);
-
-        List<String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 3, true);
+        HashMap<String, String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 3, true, false);
+        manualExperiment.putAll(patchAnalysisResults);
 
         ArrayList<String> dataEntry = new ArrayList<String>();
-        dataEntry.add(Integer.toString(currentIteration + 1));
-        for (int t=0;t<manualTestStatistics.size();t++) {
-            dataEntry.add(manualTestStatistics.get(t));
-        }
-        dataEntry.add(Integer.toString(0));
-        dataEntry.add(Integer.toString(currentGinSeed));
-        for (int p=0;p<patchAnalysisResults.size();p++) {
-            dataEntry.add(patchAnalysisResults.get(p));
+
+        for (int ind=0;ind<headers.length; ind++) {
+            dataEntry.add(manualExperiment.get(headers[ind]));
         }
         this_experiment.writeResult(dataEntry);
 

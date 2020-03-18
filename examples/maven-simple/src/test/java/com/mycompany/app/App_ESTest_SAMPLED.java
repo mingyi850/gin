@@ -13,9 +13,9 @@ import org.evosuite.runtime.EvoRunnerParameters;
 import org.junit.runner.RunWith;
 
 @RunWith(EvoRunner.class) @EvoRunnerParameters(mockJVMNonDeterminism = true, useVFS = true, useVNET = true, resetStaticState = true, useJEE = true) 
-public class App_ESTest extends App_ESTest_scaffolding {
+public class App_ESTest_SAMPLED extends App_ESTest_scaffolding {
 
-  @Test(timeout = 4000)
+/*  @Test(timeout = 4000)
   public void test0()  throws Throwable  {
       int int0 = App.classifyTriangle(1478, 0, (-1));
       assertEquals(0, int0);
@@ -33,20 +33,20 @@ public class App_ESTest extends App_ESTest_scaffolding {
       assertEquals(1, int0);
   }
 
-  @Test(timeout = 4000)
+*/  @Test(timeout = 4000)
   public void test3()  throws Throwable  {
       int int0 = App.classifyTriangle(1258, 1258, 2166);
       assertEquals(3, int0);
   }
 
-  @Test(timeout = 4000)
+/*  @Test(timeout = 4000)
   public void test4()  throws Throwable  {
       String[] stringArray0 = new String[3];
       App.main(stringArray0);
       assertEquals(3, stringArray0.length);
   }
 
-  @Test(timeout = 4000)
+*/  @Test(timeout = 4000)
   public void test5()  throws Throwable  {
       App app0 = new App();
       assertNotNull(app0);

@@ -50,6 +50,12 @@ public class LocalSearch {
 
     protected SourceFile sourceFile;
     InternalTestRunner testRunner;
+
+    //List<UnitTests> testRunner.getTests()
+    //Sample(num of unit tests or proportion)
+    //testRunner.setTests(Sample of test)
+
+
     protected Random rng;
 
     // Instantiate a class and call search
@@ -248,7 +254,7 @@ public class LocalSearch {
         if (neighbour.size() > 0 && rng.nextFloat() > 0.5) {
             neighbour.remove(rng.nextInt(neighbour.size()));
         } else {
-            neighbour.addRandomEdit(rng, Collections.singletonList(Edit.EditType.LINE));
+            neighbour.addRandomEdit(rng, Collections.singletonList(Edit.EditType.STATEMENT));
         }
 
         return neighbour;
