@@ -48,8 +48,14 @@ public class LocalSearch {
     @Argument(alias = "t", description = "Test class name")
     protected String testClassName;
 
+
+    @Argument(alias = "et", description = "Edit Type")
+    protected String editType = "LINE";
+
     protected SourceFile sourceFile;
     InternalTestRunner testRunner;
+
+
 
     //List<UnitTests> testRunner.getTests()
     //Sample(num of unit tests or proportion)
@@ -88,7 +94,7 @@ public class LocalSearch {
     }
 
     //Alternate public constructor for chaining
-    public LocalSearch(File filename, String methodSignature, Integer seed, Integer numSteps, File packageDir, String className, String classPath, String testClassName) {
+    public LocalSearch(File filename, String methodSignature, Integer seed, Integer numSteps, File packageDir, String className, String classPath, String testClassName, String editType) {
         this.filename = filename;
         this.methodSignature = methodSignature;
         this.seed = seed;
@@ -97,9 +103,15 @@ public class LocalSearch {
         this.className = className;
         this.classPath = classPath;
         this.testClassName = testClassName;
+        this.editType = editType;
 
-        this.sourceFile = new SourceFileLine(this.filename, this.methodSignature);
         this.rng = new Random(seed);
+        if (this.editType == "LINE") {
+            this.sourceFile = new SourceFileLine(this.filename, this.methodSignature);
+        }
+        else {
+            this.sourceFile = new SourceFileTree(this.filename, this.methodSignature);
+        }
         if (this.packageDir == null) {
             this.packageDir = this.filename.getParentFile().getAbsoluteFile();
         }
@@ -250,11 +262,17 @@ public class LocalSearch {
     Patch neighbour(Patch patch) {
 
         Patch neighbour = patch.clone();
-
+        Edit.EditType editType;
+        if (this.editType == "LINE") {
+            editType = Edit.EditType.LINE;
+        }
+        else {
+            editType = Edit.EditType.STATEMENT;
+        }
         if (neighbour.size() > 0 && rng.nextFloat() > 0.5) {
             neighbour.remove(rng.nextInt(neighbour.size()));
         } else {
-            neighbour.addRandomEdit(rng, Collections.singletonList(Edit.EditType.STATEMENT));
+            neighbour.addRandomEdit(rng, Collections.singletonList(editType));
         }
 
         return neighbour;

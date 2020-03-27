@@ -96,6 +96,10 @@ public class Experiment {
     protected String output_variables = "TARGET_CLASS,criterion,Size,Length,Fitness,Total_Time"; // coverage goal for test generation
 
     // Local Search Variables
+
+    @Argument(alias = "et", description = "Edit Type")
+    protected String editType = "LINE";
+
     @Argument(alias = "f", description = "Required: Source filename", required=true)
     protected File filename = null;
 
@@ -129,6 +133,8 @@ public class Experiment {
 
     @Argument(alias = "iter", description = "Number of iterations of experiment")
     protected Integer iterations = 1;
+
+
 
     protected int totalIterations = 1;
 
@@ -233,15 +239,15 @@ public class Experiment {
         LocalSearch simpleLocalSearch;
         if (oracleTest == false) {
             if (sampleTest == false) {
-                simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, testClassName);
+                simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, testClassName, editType);
             }
             else {
-                simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, sampledClassName);
+                simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, sampledClassName, editType);
             }
         }
 
         else {
-            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, oracleTestClassName);
+            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, oracleTestClassName, editType);
         }
         String patchText = simpleLocalSearch.getPatchFromSearch();
 
@@ -258,8 +264,6 @@ public class Experiment {
 
              patchAnalysisResult = getPatchAnalysis();
              patchResults.add(patchAnalysisResult);
-
-
 
         }
 
@@ -292,8 +296,11 @@ public class Experiment {
             if (sampled) {
                 testClass = sampledClassName;
             }
-            testClass = testClassName;
+            else {
+                testClass = testClassName;
+            }
         }
+        System.out.println("Getting coverage results for class: " + testClass);
         CoverageMeasurer measurer = new CoverageMeasurer(classNames[0], String.join(":",criterion_list), evosuiteCP, new File(classPath), testClass);
         String coverageOutput = measurer.measureCoverage();
         HashMap<String, String> outputMap = measurer.parseOutput(coverageOutput);
@@ -484,19 +491,28 @@ public class Experiment {
                 decrement = 1;
             }
             for (int x = 0; x < intervals; x++) {
+                System.out.println("Interval " + x);
                 if (x > 0) { // don't do anything for first iteration
                     sampler.commentOutNTests(sampler.getSampledTestFile(), decrement, currentGinSeed);
+                    System.out.println("commentedOut " + decrement + " Tests");
                     this_experiment.testCaseGen.runAllTests();
+                    System.out.println("Tests are run and compiled");
                     if (experimentResults.containsKey("Size")) {
-                        experimentResults.put("Size", String.valueOf(Integer.parseInt(experimentResults.get("Size")) - decrement));
+                        int newSize = Integer.parseInt(experimentResults.get("Size")) - decrement;
+                        if (newSize < 1) {
+                            newSize = 1;
+                        }
+                        experimentResults.put("Size", String.valueOf(newSize));
                     }
                     coverageResults = this_experiment.getTestCoverageResults(false, true);
+                    System.out.println("Got Coverage Results");
                     experimentResults.putAll(coverageResults);
                     System.out.println("Experiment Results so far: " + experimentResults.toString());
 
                 }
 
                 HashMap<String, String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 3, false, true);
+                System.out.println("Got best localsearch patch");
                 experimentResults.putAll(patchAnalysisResults);
                 ArrayList<String> dataEntry = new ArrayList<String>();
 
@@ -505,9 +521,10 @@ public class Experiment {
                 }
                 this_experiment.writeResult(dataEntry);
                 currentIteration++;
+                System.out.println("CurrentIteration " + currentIteration);
             }
 
-            ; //global counter for iterations
+             //global counter for iterations
 
         }
         //Additional Patch using manually written Test (oracle)

@@ -21,7 +21,7 @@ public class App_ESTest_SAMPLED extends App_ESTest_scaffolding {
       assertEquals(0, int0);
   }
 
-  @Test(timeout = 4000)
+*/  @Test(timeout = 4000)
   public void test1()  throws Throwable  {
       int int0 = App.classifyTriangle(3, 606, 606);
       assertEquals(3, int0);
@@ -33,26 +33,26 @@ public class App_ESTest_SAMPLED extends App_ESTest_scaffolding {
       assertEquals(1, int0);
   }
 
-*/  @Test(timeout = 4000)
+/*  @Test(timeout = 4000)
   public void test3()  throws Throwable  {
       int int0 = App.classifyTriangle(1258, 1258, 2166);
       assertEquals(3, int0);
   }
 
-/*  @Test(timeout = 4000)
+  @Test(timeout = 4000)
   public void test4()  throws Throwable  {
       String[] stringArray0 = new String[3];
       App.main(stringArray0);
       assertEquals(3, stringArray0.length);
   }
 
-*/  @Test(timeout = 4000)
+  @Test(timeout = 4000)
   public void test5()  throws Throwable  {
       App app0 = new App();
       assertNotNull(app0);
   }
 
-  @Test(timeout = 4000)
+*/  @Test(timeout = 4000)
   public void test6()  throws Throwable  {
       int int0 = App.classifyTriangle(1796, 1796, 1796);
       assertEquals(2, int0);

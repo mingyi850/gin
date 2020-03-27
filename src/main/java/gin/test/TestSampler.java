@@ -196,10 +196,15 @@ public class TestSampler {
         if (numberofTests >= testsToSample) {
             numberofTests = testsToSample - 1; // all tests except 1
         }
+        System.out.println("Tests to sample " + testsToSample);
+        System.out.println("Number of tests to remove " + numberofTests);
         for (int x = 0; x < numberofTests; x++) {
-            index = rng.nextInt(this.totalTests - 2);
+            index = rng.nextInt(this.totalTests - 1);
+            System.out.println("Closed : " + closedTests.toString());
+            System.out.println("Commented out already : " + outset.toString());
+            System.out.println("trying to remove index " + index);
             while (closedTests.contains(index) || outset.contains(index)) {
-                index = rng.nextInt(this.totalTests - 2);
+                index = rng.nextInt(this.totalTests - 1);
             }
             testIndexes.add(index);
             outset.add(index);
