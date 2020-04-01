@@ -1,1 +1,1 @@
-| gin.edit.line.DeleteLine examples\maven-simple\src\main\java\com\mycompany\app\App.java:21 | gin.edit.line.CopyLine examples\maven-simple\src\main\java\com\mycompany\app\App.java:11 -> examples\maven-simple\src\main\java\com\mycompany\app\App.java:25 |
+|

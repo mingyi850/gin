@@ -1,0 +1,3 @@
+"Index","TARGET_CLASS","criterion","Size","Length","Fitness","Total_Time","evo_seed","WEAKMUTATION_Coverage","BRANCH_Coverage","LINE_Coverage","EXCEPTION_Coverage","gin_seed","patch","validpatch","success","avgtime","speedup"
+"1","locogp.SortBubble","WEAKMUTATION","4","22","0.5","16743","66","99","86","88","100","44","|","false","true","0","0.0"
+"1","locogp.SortBubble","WEAKMUTATION","3","22","0.5","16743","66","49","71","50","100","44","| gin.edit.statement.SwapStatement examples\locoGP\src\main\java\locogp\SortBubble.java:90 <-> examples\locoGP\src\main\java\locogp\SortBubble.java:18 |","true","true","2732380","42.478752"

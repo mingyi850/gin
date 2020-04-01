@@ -1,0 +1,24 @@
+TITLE "Experiment"
+
+ECHO Starting experiment... Loading Variables
+
+SET directory=examples/locoGP/
+SET projectname=locogp
+SET mavenhome=C:/apache-maven-3.6.2
+SET evosuitecp=gin-fork/testgeneration/evosuite-1.0.6.jar
+SET classnames=SortBubble
+SET criterion=branch
+SET filepath=examples/locoGP/src/main/java/locogp/SortBubble.java
+SET methodsignature="sort(Integer[], Integer)"
+SET classpath=examples/locoGP/target/classes/
+SET testclasspath=newTestCode2/target/test-classes
+SET evosuitetest=locogp.SortBubble_ESTest
+SET oracletest=locogp.SortBubbleTest
+SET criterionlist=weakmutation,branch,line,exception
+SET iterations=1
+
+
+java -cp gin-fork/build/gin.jar;gin-fork/testgeneration/evosuite-1.0.6.jar gin.util.Experiment -d %directory% -p %projectname% -mavenHome %mavenhome% -evosuiteCP %evosuitecp% -classNames %classnames% -generateTests -criterion %criterion% -f %filepath% -m %methodsignature% -cp %classpath%;%testclasspath% -t %evosuitetest% -oracle %oracletest% -criterionList %criterionlist% -iter %iterations%
+
+ECHO Experiment Complete
+

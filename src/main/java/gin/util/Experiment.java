@@ -173,6 +173,7 @@ public class Experiment {
     //Finally, append the combined results of each run of the experiment into a CSV file. This ensures line integrity.
 
     Experiment(String[] args) {
+
         Args.parseOrExit(this, args);
         if (this.criterion_list.length == 0) {
             System.out.println("no criterion list");
@@ -193,7 +194,7 @@ public class Experiment {
         this.evoOutputVariablesList = output_variables.split(",");
         initialiseExperimentHeader();
         sampledClassName = this.testClassName + "_SAMPLED";
-
+        System.out.println("EditType is : " + this.editType);
 
 
 

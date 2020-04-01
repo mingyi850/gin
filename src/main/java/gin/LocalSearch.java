@@ -106,10 +106,12 @@ public class LocalSearch {
         this.editType = editType;
 
         this.rng = new Random(seed);
-        if (this.editType == "LINE") {
+        if (this.editType.equals("LINE")) {
+            System.out.println("Using LINE edits");
             this.sourceFile = new SourceFileLine(this.filename, this.methodSignature);
         }
         else {
+            System.out.println("Using STATEMENT edits: editType = " + editType);
             this.sourceFile = new SourceFileTree(this.filename, this.methodSignature);
         }
         if (this.packageDir == null) {
@@ -262,17 +264,17 @@ public class LocalSearch {
     Patch neighbour(Patch patch) {
 
         Patch neighbour = patch.clone();
-        Edit.EditType editType;
-        if (this.editType == "LINE") {
-            editType = Edit.EditType.LINE;
+        Edit.EditType thisEditType;
+        if (this.editType.equals("LINE")) {
+            thisEditType = Edit.EditType.LINE;
         }
         else {
-            editType = Edit.EditType.STATEMENT;
+            thisEditType = Edit.EditType.STATEMENT;
         }
         if (neighbour.size() > 0 && rng.nextFloat() > 0.5) {
             neighbour.remove(rng.nextInt(neighbour.size()));
         } else {
-            neighbour.addRandomEdit(rng, Collections.singletonList(editType));
+            neighbour.addRandomEdit(rng, Collections.singletonList(thisEditType));
         }
 
         return neighbour;
