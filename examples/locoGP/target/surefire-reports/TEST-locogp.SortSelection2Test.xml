@@ -63,11 +63,11 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase classname="locogp.SortSelection2Test" name="checkSorting0" time="0.003"/>
+  <testcase classname="locogp.SortSelection2Test" name="checkSorting0" time="0.002"/>
   <testcase classname="locogp.SortSelection2Test" name="checkSorting1" time="0"/>
   <testcase classname="locogp.SortSelection2Test" name="checkSorting2" time="0"/>
   <testcase classname="locogp.SortSelection2Test" name="checkSorting3" time="0"/>
-  <testcase classname="locogp.SortSelection2Test" name="checkSorting4" time="0"/>
+  <testcase classname="locogp.SortSelection2Test" name="checkSorting4" time="0.001"/>
   <testcase classname="locogp.SortSelection2Test" name="checkSorting5" time="0"/>
   <testcase classname="locogp.SortSelection2Test" name="checkSorting6" time="0"/>
 </testsuite>

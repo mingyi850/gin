@@ -64,10 +64,10 @@
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
   <testcase classname="locogp.SortInsertionTest" name="checkSorting0" time="0.001"/>
-  <testcase classname="locogp.SortInsertionTest" name="checkSorting1" time="0.001"/>
+  <testcase classname="locogp.SortInsertionTest" name="checkSorting1" time="0"/>
   <testcase classname="locogp.SortInsertionTest" name="checkSorting2" time="0"/>
-  <testcase classname="locogp.SortInsertionTest" name="checkSorting3" time="0.002"/>
-  <testcase classname="locogp.SortInsertionTest" name="checkSorting4" time="0"/>
+  <testcase classname="locogp.SortInsertionTest" name="checkSorting3" time="0"/>
+  <testcase classname="locogp.SortInsertionTest" name="checkSorting4" time="0.001"/>
   <testcase classname="locogp.SortInsertionTest" name="checkSorting5" time="0"/>
-  <testcase classname="locogp.SortInsertionTest" name="checkSorting6" time="0"/>
+  <testcase classname="locogp.SortInsertionTest" name="checkSorting6" time="0.002"/>
 </testsuite>

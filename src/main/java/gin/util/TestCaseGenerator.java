@@ -206,7 +206,7 @@ public class TestCaseGenerator {
         this.classNames = classNames;
         this.seed = seed;
         this.search_budget = search_budget;
-        this. criterion = criterion;
+        this.criterion = criterion;
         this.output_variables = output_variables;
 
         this.project = new Project(projectDir, projectName);
@@ -223,12 +223,13 @@ public class TestCaseGenerator {
 
         if (outputDir == null) {
             setOutputDir();
+            System.out.println("Setting output Dir = " + outputDir);
         } else {
             checkIfRewrite = true;
         }
 
         if (removeTests) {
-
+            Logger.info("Outputdir now =" + outputDir);
             Logger.info("Tests will be removed from " + outputDir.getAbsolutePath());
             try  {
                 cleanOutputDir(outputDir);

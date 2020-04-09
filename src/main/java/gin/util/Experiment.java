@@ -87,7 +87,7 @@ public class Experiment {
     protected String search_budget = "50000"; // search budget for MaxStatements stopping condition
 
     @Argument(alias = "criterion", description = "Criterion for test generation. Set to line by default")
-    protected String criterion = "line"; // coverage goal for test generation
+    protected String criterion = "line"; // coverage goal for single test generation
 
     @Argument(alias = "criterionList", description = "Criterion list for test generation.")
     protected String[]  criterion_list = {};
@@ -308,6 +308,14 @@ public class Experiment {
         return outputMap;
     }
 
+    private HashMap<String, String> generateEmptyCoverageResult() {
+        HashMap<String ,String> returnMap = new HashMap<String,String>();
+        for (int x = 0; x < criterion_list.length; x++) {
+            returnMap.put(criterion_list[x].toUpperCase() + "_Coverage", "0");
+        }
+        return returnMap;
+    }
+
     private List<String> parsePatchResult(HashMap<String, String> bestPatch) {
         List<String> finalResults = new ArrayList<String>();
         finalResults.add(bestPatch.get("patch"));
@@ -449,17 +457,15 @@ public class Experiment {
         int currentGinSeed=12;
         String currentCriterion;
         int currentIteration=0;
+        HashMap<String, String> coverageResults;
         HashMap<String, String> experimentResults;
         String[] evoOutputHeaders = this_experiment.getEvoOutputVariablesList();
         String[] headers = this_experiment.EXPERIMENT_HEADER;
 
         for (int iteration=0; iteration < this_experiment.totalIterations; iteration++) {
             experimentResults = new HashMap<String, String>();
-            experimentResults.put("Index", Integer.toString(iteration + 1));
             currentEvoSeed = seedGen.nextInt(100);
             seedGen.setSeed(currentEvoSeed);
-            currentGinSeed = seedGen.nextInt(100);
-            experimentResults.put("gin_seed", Integer.toString(currentGinSeed));
             experimentResults.put("evo_seed", Integer.toString(currentEvoSeed));
 
             currentCriterion = this_experiment.criterion_list[Math.floorDiv(iteration, this_experiment.iterations)];
@@ -477,11 +483,10 @@ public class Experiment {
             for (int x=0;x< evoOutputHeaders.length; x++) {
                 experimentResults.put(evoOutputHeaders[x], testStatistics.get(x));
             }
-            HashMap<String, String> coverageResults = this_experiment.getTestCoverageResults(false, false);
+            //get coverage results and place into HashMap
+            coverageResults = this_experiment.generateEmptyCoverageResult();
+            coverageResults = this_experiment.getTestCoverageResults(false, false);
             System.out.println("Obtained coverage results");
-
-            experimentResults.putAll(coverageResults);
-            System.out.println("Experiment Results so far: " + experimentResults.toString());
 
             //Testsampler portion:
             this_experiment.testsampler = new TestSampler(this_experiment.evoTestSource);
@@ -492,12 +497,18 @@ public class Experiment {
                 decrement = 1;
             }
             for (int x = 0; x < intervals; x++) {
+                experimentResults.put("Index", Integer.toString(currentIteration + 1));
+                currentGinSeed = seedGen.nextInt(100);
+                seedGen.setSeed(currentGinSeed);
+                experimentResults.put("gin_seed", Integer.toString(currentGinSeed));
                 System.out.println("Interval " + x);
-                if (x > 0) { // don't do anything for first iteration
+
+                if (x > 0) { // don't do anything for first iteration, use coverage obtained from main loop
                     sampler.commentOutNTests(sampler.getSampledTestFile(), decrement, currentGinSeed);
                     System.out.println("commentedOut " + decrement + " Tests");
                     this_experiment.testCaseGen.runAllTests();
                     System.out.println("Tests are run and compiled");
+                    coverageResults = this_experiment.generateEmptyCoverageResult();
                     if (experimentResults.containsKey("Size")) {
                         int newSize = Integer.parseInt(experimentResults.get("Size")) - decrement;
                         if (newSize < 1) {
@@ -507,12 +518,12 @@ public class Experiment {
                     }
                     coverageResults = this_experiment.getTestCoverageResults(false, true);
                     System.out.println("Got Coverage Results");
-                    experimentResults.putAll(coverageResults);
-                    System.out.println("Experiment Results so far: " + experimentResults.toString());
+
 
                 }
-
-                HashMap<String, String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 3, false, true);
+                experimentResults.putAll(coverageResults);
+                System.out.println("Experiment Results so far: " + experimentResults.toString());
+                HashMap<String, String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 10, false, true);
                 System.out.println("Got best localsearch patch");
                 experimentResults.putAll(patchAnalysisResults);
                 ArrayList<String> dataEntry = new ArrayList<String>();

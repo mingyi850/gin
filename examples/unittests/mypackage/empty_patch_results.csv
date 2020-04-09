@@ -1,4 +1,4 @@
 "PatchIndex","PatchSize","Patch","MethodIndex","TestIndex","UnitTest","RepNumber","PatchValid","PatchCompiled","TestPassed","TestExecutionTime(ns)","TestCPUTime(ns)","TestTimedOut","TestExceptionType","TestExceptionMessage","AssertionExpectedValue","AssertionActualValue"
-"1","0","|","0","1","mypackage.ExampleTest.testReturnTen []","1","true","true","true","8326900","0","false","N/A","N/A","N/A","N/A"
-"1","0","|","0","2","mypackage.ExampleTest.emptyTest []","1","true","true","true","3298600","0","false","N/A","N/A","N/A","N/A"
-"1","0","|","0","3","mypackage.ExampleTest.testReturnOneHundred []","1","true","true","true","1947100","0","false","N/A","N/A","N/A","N/A"
+"1","0","|","0","1","mypackage.ExampleTest.testReturnTen []","1","true","true","true","2653900","0","false","N/A","N/A","N/A","N/A"
+"1","0","|","0","2","mypackage.ExampleTest.emptyTest []","1","true","true","true","355600","0","false","N/A","N/A","N/A","N/A"
+"1","0","|","0","3","mypackage.ExampleTest.testReturnOneHundred []","1","true","true","true","331500","0","false","N/A","N/A","N/A","N/A"
