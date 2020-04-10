@@ -15,7 +15,7 @@ import org.junit.Test;
 
 
 public class TestSamplerTest {
-    File testtest = new File("C:\\Users\\Admin\\Documents\\Computer Science\\Y3\\Final Year Project\\gin-fork\\examples\\maven-simple\\src\\test\\java\\com\\mycompany\\app\\App_ESTest.java");
+    File testtest = new File(new File(".").getAbsolutePath() + File.separator + "examples" + File.separator + "maven-simple" + File.separator + "src" + File.separator + "test" + File.separator + "java" + File.separator + "com" + File.separator + "mycompany" + File.separator + "app" + File.separator + "App_ESTest.java");
 
     TestSampler sampler = new TestSampler(testtest);
 
