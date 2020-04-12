@@ -1,16 +1,27 @@
 import os
 import shutil
+import sys
 
+mavenhome = "{MAVEN HOME HERE}" #Add maven directory here
+
+platform = sys.platform
+if platform != "win32":
+    platform = "others"
+print("Current platform: " + platform)
 sep = os.path.sep
 #Create experiments file
 try:
     os.mkdir("experiments")
 except FileExistsError:
-    shutil.rmtree("experiments")
-    os.mkdir("experiments")
+    existingfiles = [f for f in os.listdir("experiments") if f[-3:]==".sh" or f[-4:]==".bat"]
+    print("Deleting existing experiment script files: " , existingfiles, "\n")
+    for fn in existingfiles:
+        fnpath = "experiments" + sep + fn
+        os.remove(fnpath)
 
 
-mavenhome = "{MAVEN HOME HERE}"
+
+
 projectdir = sep.join(["..","examples","locoGP"])
 projectname = "locogp"
 evosuitecp = sep.join(["..","testgeneration","evosuite-1.0.6.jar"])
@@ -32,14 +43,14 @@ ginpath = sep.join(["..", "build", "gin.jar"])
 #sourcpath is path of source files relative to experiment directory
 sourcepath = sep.join(["examples", "locoGP", "src", "main", "java", "locogp"])
 javafiles = [f for f in os.listdir(sourcepath) if f[-5:]==".java"]
-print(javafiles)
+print("Files to generate experiments for: ",  javafiles, "\n")
 
 for javafile in javafiles:
     classname = javafile[:-5]
     classnames = classnamesBASE + classname
     oracletest = oracletestBASE + classname + "Test"
     evosuitetest = evosuitetestBASE + classname + "_ESTest"
-    evotestsource = evotestsourceBASE + classname + classname + "_ESTest.java"
+    evotestsource = evotestsourceBASE + classname + "_ESTest.java"
     filepath = filepathBASE + javafile
 
     expCommand = " ".join(["java", "-cp", ginpath + os.pathsep + evosuitecp, "gin.util.Experiment", \
@@ -48,13 +59,19 @@ for javafile in javafiles:
                            "-m", methodsignature, "-cp", classpath + os.pathsep + testclasspath, "-t", evosuitetest, \
                            "-evoTestSource", evotestsource, "-oracle", oracletest, "-criterionList", criterionlist, \
                            "-iter", iterations, "-et", edittype])
-    print(expCommand)
-    scriptName = classname + "Exp.sh"
+    #print(expCommand)
+    suffix = ".bat" if platform == "win32" else ".sh"
+    scriptName = classname + "Exp" + suffix
 
     with open("experiments" + sep + scriptName, "w+") as f:
+        if (platform == "win32"):
+            f.write("TITLE: " + scriptName + "\n")
         f.write("#!/bin/bash\n")
         f.write("# " + scriptName + "\n\n")
         f.write(expCommand + "\n")
+
+print("Successfully generated experiments")
+
 
 
 
