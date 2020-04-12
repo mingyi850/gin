@@ -75,7 +75,7 @@ public class Experiment {
     protected boolean generateTests = false;
 
     @Argument(alias = "test", description = "Run all tests in outputDir, set to projectDir/src/test/java if outputDir not specified")
-    protected boolean test = false;
+    protected boolean test = true;
 
     @Argument(alias = "classNumber", description = "Number of classes to generate EvoSuite tests for, used for debugging purposes")
     protected Integer classNumber = 0;

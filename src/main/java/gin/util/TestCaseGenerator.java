@@ -274,7 +274,7 @@ public class TestCaseGenerator {
 
         if (test) {
 
-            Logger.info("Running all tests from " + outputDir.getAbsolutePath());
+            //Logger.info("Running all tests from " + outputDir.getAbsolutePath());
             runAllTests();
         }
     }
