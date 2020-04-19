@@ -212,9 +212,10 @@ public class Experiment {
         for (int x=0; x< criterion_list.length; x++) {
             headers.add(criterion_list[x] + "_Coverage");
         }
+        headers.add("sampled");
         headers.add("gin_seed");
         Collections.addAll(headers, gin_headers);
-        String[] a = {"dummy"};
+        String[] a = {""};
         EXPERIMENT_HEADER = headers.toArray(a);
         printArr(EXPERIMENT_HEADER);
     }
@@ -501,8 +502,9 @@ public class Experiment {
                 seedGen.setSeed(currentGinSeed);
                 experimentResults.put("gin_seed", Integer.toString(currentGinSeed));
                 System.out.println("Interval " + x);
-
+                experimentResults.put("sampled", "False");
                 if (x > 0) { // don't do anything for first iteration, use coverage obtained from main loop
+                    experimentResults.put("sampled", "True");
                     sampler.commentOutNTests(sampler.getSampledTestFile(), decrement, currentGinSeed);
                     System.out.println("commentedOut " + decrement + " Tests");
                     this_experiment.testCaseGen.runAllTests();
