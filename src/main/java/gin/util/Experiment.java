@@ -497,7 +497,6 @@ public class Experiment {
                 decrement = 1;
             }
             for (int x = 0; x < intervals; x++) {
-                experimentResults.put("Index", Integer.toString(currentIteration + 1));
                 currentGinSeed = seedGen.nextInt(100);
                 seedGen.setSeed(currentGinSeed);
                 experimentResults.put("gin_seed", Integer.toString(currentGinSeed));
@@ -523,17 +522,24 @@ public class Experiment {
                 }
                 experimentResults.putAll(coverageResults);
                 System.out.println("Experiment Results so far: " + experimentResults.toString());
-                HashMap<String, String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 10, false, true);
-                System.out.println("Got best localsearch patch");
-                experimentResults.putAll(patchAnalysisResults);
-                ArrayList<String> dataEntry = new ArrayList<String>();
+                for (int lsCount = 0; lsCount < 20; lsCount++) {
+                    experimentResults.put("Index", Integer.toString(currentIteration + 1));
+                    currentGinSeed = seedGen.nextInt();
+                    experimentResults.put("gin_seed", Integer.toString(currentGinSeed));
+                    HashMap<String,String> patchAnalysisResults = new HashMap<>();
+                    patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 1, false, true);
+                    System.out.println("Got best localsearch patch");
+                    experimentResults.putAll(patchAnalysisResults);
+                    ArrayList<String> dataEntry = new ArrayList<String>();
 
-                for (int ind=0;ind<headers.length; ind++) {
-                    dataEntry.add(experimentResults.get(headers[ind]));
+                    for (int ind=0;ind<headers.length; ind++) {
+                        dataEntry.add(experimentResults.get(headers[ind]));
+                    }
+                    this_experiment.writeResult(dataEntry);
+                    currentIteration++;
+                    System.out.println("CurrentIteration " + currentIteration);
                 }
-                this_experiment.writeResult(dataEntry);
-                currentIteration++;
-                System.out.println("CurrentIteration " + currentIteration);
+
             }
 
              //global counter for iterations
@@ -543,18 +549,23 @@ public class Experiment {
         HashMap<String, String> manualExperiment = new HashMap<String, String>();
         HashMap<String, String> manualTestStatistics = this_experiment.generateManualTestStatistics();
         manualExperiment.putAll(manualTestStatistics);
-        manualExperiment.put("Index", Integer.toString(currentIteration + 1));
-        this_experiment.patchText = this_experiment.getLocalSearchPatch(currentGinSeed, true, false);
 
-        HashMap<String, String> patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 3, true, false);
-        manualExperiment.putAll(patchAnalysisResults);
+        //Generate patches and datalines for current test file
+        for (int lsCount = 0; lsCount < 20; lsCount++) {
+            manualExperiment.put("Index", Integer.toString(currentIteration + 1));
+            currentGinSeed = seedGen.nextInt();
+            HashMap<String, String> patchAnalysisResults = new HashMap<>();
+            patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 1, true, false);
+            manualExperiment.putAll(patchAnalysisResults);
 
-        ArrayList<String> dataEntry = new ArrayList<String>();
+            ArrayList<String> dataEntry = new ArrayList<String>();
 
-        for (int ind=0;ind<headers.length; ind++) {
-            dataEntry.add(manualExperiment.get(headers[ind]));
+            for (int ind=0;ind<headers.length; ind++) {
+                dataEntry.add(manualExperiment.get(headers[ind]));
+            }
+            this_experiment.writeResult(dataEntry);
         }
-        this_experiment.writeResult(dataEntry);
+
 
 
 
