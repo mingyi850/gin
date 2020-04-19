@@ -524,7 +524,7 @@ public class Experiment {
                 System.out.println("Experiment Results so far: " + experimentResults.toString());
                 for (int lsCount = 0; lsCount < 20; lsCount++) {
                     experimentResults.put("Index", Integer.toString(currentIteration + 1));
-                    currentGinSeed = seedGen.nextInt();
+                    currentGinSeed = seedGen.nextInt(100);
                     experimentResults.put("gin_seed", Integer.toString(currentGinSeed));
                     HashMap<String,String> patchAnalysisResults = new HashMap<>();
                     patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 1, false, true);
@@ -553,7 +553,7 @@ public class Experiment {
         //Generate patches and datalines for current test file
         for (int lsCount = 0; lsCount < 20; lsCount++) {
             manualExperiment.put("Index", Integer.toString(currentIteration + 1));
-            currentGinSeed = seedGen.nextInt();
+            currentGinSeed = seedGen.nextInt(100);
             HashMap<String, String> patchAnalysisResults = new HashMap<>();
             patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 1, true, false);
             manualExperiment.putAll(patchAnalysisResults);
