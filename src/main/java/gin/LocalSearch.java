@@ -1,8 +1,7 @@
 package gin;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 import com.sampullara.cli.Argument;
 import com.sampullara.cli.Args;
@@ -48,12 +47,16 @@ public class LocalSearch {
     @Argument(alias = "t", description = "Test class name")
     protected String testClassName;
 
+    @Argument(alias = "o", description = "Oracle class name")
+    protected String oracleClassName;
+
 
     @Argument(alias = "et", description = "Edit Type")
     protected String editType = "LINE";
 
     protected SourceFile sourceFile;
     InternalTestRunner testRunner;
+    InternalTestRunner oracleRunner;
 
 
 
@@ -89,12 +92,16 @@ public class LocalSearch {
         if (this.testClassName == null) {
             this.testClassName = this.className + "Test";
         }
-        this.testRunner = new InternalTestRunner(className, classPath, testClassName);
 
+        if (this.oracleClassName == null) {
+            this.oracleClassName = this.className + "_ESTest";
+        }
+        this.testRunner = new InternalTestRunner(className, classPath, testClassName);
+        this.oracleRunner = new InternalTestRunner(className, classPath, oracleClassName);
     }
 
     //Alternate public constructor for chaining
-    public LocalSearch(File filename, String methodSignature, Integer seed, Integer numSteps, File packageDir, String className, String classPath, String testClassName, String editType) {
+    public LocalSearch(File filename, String methodSignature, Integer seed, Integer numSteps, File packageDir, String className, String classPath, String testClassName, String oracleClassName, String editType) {
         this.filename = filename;
         this.methodSignature = methodSignature;
         this.seed = seed;
@@ -104,6 +111,7 @@ public class LocalSearch {
         this.classPath = classPath;
         this.testClassName = testClassName;
         this.editType = editType;
+        this.oracleClassName = oracleClassName;
 
         this.rng = new Random(seed);
         if (this.editType.equals("LINE")) {
@@ -128,7 +136,11 @@ public class LocalSearch {
         if (this.testClassName == null) {
             this.testClassName = this.className + "Test";
         }
+        if (this.oracleClassName == null) {
+            this.oracleClassName = this.className + "_ESTest";
+        }
         this.testRunner = new InternalTestRunner(this.className, this.classPath, this.testClassName);
+        this.oracleRunner = new InternalTestRunner(this.className, this.classPath, this.oracleClassName);
     }
 
     // Apply empty patch and return execution time
@@ -253,6 +265,93 @@ public class LocalSearch {
         bestPatch.writePatchedSourceToFile(sourceFile.getFilename() + ".optimised");
         bestPatch.writePatchStringToFile("bestpatch.txt");
         return bestPatch.toString();
+    }
+
+    //Returns hashmap of all intermediate patches and their properties
+    public List<HashMap<String,String>> getPatchFromSearchWithIntermediate() {
+
+        Logger.info(String.format("Localsearch on file: %s method: %s", filename, methodSignature));
+
+        // Time original code
+        long origTime = timeOriginalCode();
+        Logger.info("Original execution time: " + origTime + "ns");
+
+        // Start with empty patch
+        Patch bestPatch = new Patch(this.sourceFile);
+        long bestTime = origTime;
+        ArrayList<HashMap<String,String>> patchResultsList = new ArrayList<>();
+        for (int step = 1; step <= numSteps; step++) {
+
+            Patch neighbour = neighbour(bestPatch);
+            UnitTestResultSet testResultSet = testRunner.runTests(neighbour, 1);
+            UnitTestResultSet oracleResultSet;
+            HashMap<String, String> oracleResultParsed;
+            String msg;
+
+            if (!testResultSet.getValidPatch()) {
+                msg = "Patch invalid";
+            } else if (!testResultSet.getCleanCompile()) {
+                msg = "Failed to compile";
+            } else if (!testResultSet.allTestsSuccessful()) {
+                msg = ("Failed to pass all tests");
+            } else if (testResultSet.totalExecutionTime() >= bestTime) {
+                msg = "Time: " + testResultSet.totalExecutionTime() + "ns";
+                oracleResultSet = oracleRunner.runTests(neighbour, 1);
+                oracleResultParsed = new HashMap<String, String>();
+                oracleResultParsed.put("patch", bestPatch.toString());
+                oracleResultParsed.put("success", Boolean.toString(oracleResultSet.allTestsSuccessful()));
+                oracleResultParsed.put("intermediate", Boolean.toString(true));
+                oracleResultParsed.put("validpatch", Boolean.toString(true));
+                oracleResultParsed.put("speedup", "--");
+                oracleResultParsed.put("avgtime", "-");
+                patchResultsList.add(oracleResultParsed);
+            } else {
+                bestPatch = neighbour;
+                bestTime = testResultSet.totalExecutionTime();
+                msg = "New best time: " + bestTime + "(ns)";
+
+                //Evaluate intermediate patch against oracle and save results
+                oracleResultSet = oracleRunner.runTests(neighbour, 1);
+                oracleResultParsed = new HashMap<String, String>();
+                oracleResultParsed.put("patch", bestPatch.toString());
+                oracleResultParsed.put("success", Boolean.toString(oracleResultSet.allTestsSuccessful()));
+                oracleResultParsed.put("intermediate", Boolean.toString(true));
+                oracleResultParsed.put("validpatch", Boolean.toString(true));
+                oracleResultParsed.put("speedup", "-");
+                oracleResultParsed.put("avgtime", "-");
+                patchResultsList.add(oracleResultParsed);
+            }
+
+            Logger.info(String.format("Step: %d, Patch: %s, %s ", step, neighbour, msg));
+
+        }
+
+        Logger.info(String.format("Finished. Best time: %d (ns), Speedup (%%): %.2f, Patch: %s",
+                bestTime,
+                100.0f *((origTime - bestTime)/(1.0f * origTime)),
+                bestPatch));
+        //Mark best patch as non-intermediate patch
+        if (patchResultsList.size() > 0) {
+            int rev = 1;
+            while (rev < patchResultsList.size()) {
+                if (patchResultsList.get(patchResultsList.size() - rev).get("speedup") == "-") {
+                    break;
+                }
+                rev++;
+            }
+            patchResultsList.add(patchResultsList.get(patchResultsList.size() - rev));
+            patchResultsList.get(patchResultsList.size() - 1).put("intermediate", Boolean.toString(false));
+
+        }
+        else { // case where no patch is found
+            HashMap<String, String> emptyPatchResult = new HashMap<String, String>();
+            emptyPatchResult.put("patch", "|");
+            emptyPatchResult.put("intermediate", Boolean.toString(false));
+            patchResultsList.add(emptyPatchResult);
+        }
+        bestPatch.writePatchedSourceToFile(sourceFile.getFilename() + ".optimised");
+        bestPatch.writePatchStringToFile("bestpatch.txt");
+        return patchResultsList;
     }
 
 

@@ -156,7 +156,7 @@ public class Experiment {
             "Total_Time", "evo_seed",
             "gin_seed", "patch_text",
             "valid_patch", "all_tests_passed",
-            "execution_time", "speedup(%)"
+            "execution_time", "speedup(%)", "intermediate"
     };
 
     protected String[] gin_headers = {"patch", "validpatch", "success", "avgtime","speedup"};
@@ -215,6 +215,7 @@ public class Experiment {
         headers.add("sampled");
         headers.add("gin_seed");
         Collections.addAll(headers, gin_headers);
+        headers.add("intermediate");
         String[] a = {""};
         EXPERIMENT_HEADER = headers.toArray(a);
         printArr(EXPERIMENT_HEADER);
@@ -241,15 +242,15 @@ public class Experiment {
         LocalSearch simpleLocalSearch;
         if (oracleTest == false) {
             if (sampleTest == false) {
-                simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, testClassName, editType);
+                simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, testClassName, oracleTestClassName, editType);
             }
             else {
-                simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, sampledClassName, editType);
+                simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, sampledClassName, oracleTestClassName, editType);
             }
         }
 
         else {
-            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, oracleTestClassName, editType);
+            simpleLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, oracleTestClassName, testClassName, editType);
         }
         String patchText = simpleLocalSearch.getPatchFromSearch();
 
@@ -264,7 +265,7 @@ public class Experiment {
         for (int iter=0;iter<iterations;iter++) {
             this.patchText = getLocalSearchPatch(currentSeed + iter, oracleTest, sampledTest);
 
-             patchAnalysisResult = getPatchAnalysis();
+             patchAnalysisResult = getPatchAnalysis(oracleTest);
              patchResults.add(patchAnalysisResult);
 
         }
@@ -285,6 +286,67 @@ public class Experiment {
         }
         HashMap<String, String> bestPatch = patchResults.get(bestSpeedupIndex);
         return bestPatch;
+
+    }
+
+    private List<HashMap<String, String>> getLocalSearchPatchWithIntermediate(Integer currentSeed, Boolean oracleTest, boolean sampleTest) {
+        System.out.println(this.classNames[0]);
+        LocalSearch intermediateLocalSearch;
+        if (oracleTest == false) {
+            if (sampleTest == false) {
+                intermediateLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, testClassName, oracleTestClassName, editType);
+            }
+            else {
+                intermediateLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, sampledClassName, oracleTestClassName, editType);
+            }
+        }
+
+        else {
+            intermediateLocalSearch = new LocalSearch(filename, methodSignature, currentSeed, numSteps, projectDir, classNames[0], classPath, oracleTestClassName, testClassName, editType);
+        }
+        List<HashMap<String, String>> patchResultsList = intermediateLocalSearch.getPatchFromSearchWithIntermediate();
+
+
+        return patchResultsList;
+    }
+
+    private List<HashMap<String, String>> getBestLocalSearchPatchWithIntermediate(Integer currentSeed, Integer iterations, Boolean oracleTest, Boolean sampledTest) {
+        List<HashMap<String, String>> currentPatchList;
+        HashMap<String, String> currentPatch;
+        List<HashMap<String,String>> patchResults = new ArrayList<HashMap<String,String>>();
+        List<List<HashMap<String,String>>> patchResultsList = new ArrayList<>();
+        HashMap<String, String> patchAnalysisResult;
+        HashMap<String, String> finalPatch;
+        for (int iter=0;iter<iterations;iter++) {
+            currentPatchList = getLocalSearchPatchWithIntermediate(currentSeed + iter, oracleTest, sampledTest);
+            int rev = 1;
+
+            this.patchText = currentPatchList.get(currentPatchList.size() - 1).get("patch");
+
+            patchAnalysisResult = getPatchAnalysis(oracleTest);
+            patchResults.add(patchAnalysisResult);
+            patchResultsList.add(currentPatchList);
+
+        }
+
+        int bestSpeedupIndex = 0;
+        Float bestSpeedupTime = 0.0f;
+        Float speeduptime;
+        Boolean validity;
+        Boolean success;
+        for (int x = 0; x < iterations; x++) {
+            speeduptime = Float.parseFloat(patchResults.get(x).get("speedup"));
+            validity = Boolean.parseBoolean(patchResults.get(x).get("validpatch"));
+            success = Boolean.parseBoolean(patchResults.get(x).get("success"));
+            if (speeduptime > bestSpeedupTime && validity && success) {
+                bestSpeedupTime = speeduptime;
+                bestSpeedupIndex = x;
+            }
+        }
+        List<HashMap<String,String>> bestPatchList = patchResultsList.get(bestSpeedupIndex);
+        HashMap<String, String> bestPatch = patchResults.get(bestSpeedupIndex);
+        bestPatchList.get(bestPatchList.size() - 1).putAll(bestPatch);
+        return bestPatchList;
 
     }
 
@@ -330,13 +392,20 @@ public class Experiment {
 
 
 
-    public HashMap<String, String> getPatchAnalysis() {
+    public HashMap<String, String> getPatchAnalysis(boolean manual) {
+        String evaluationTest;
+        if (manual == false) {
+            evaluationTest = oracleTestClassName;
+        }
+        else {
+            evaluationTest = testClassName;
+        }
         String patchTrim = patchText.trim();
         System.out.println("PatchTrim: " + patchTrim);
         System.out.println("PatchTrimLength: " + patchTrim.length());
         if (patchTrim.length() > 1) {
             System.out.println("Patch trim is legit");
-            PatchAnalyser analyser = new PatchAnalyser(filename, patchText, projectDir, classNames[0], classPath, oracleTestClassName);
+            PatchAnalyser analyser = new PatchAnalyser(filename, patchText, projectDir, classNames[0], classPath, evaluationTest);
             return analyser.getAnalysisResults();
         }
         else {
@@ -452,18 +521,18 @@ public class Experiment {
         Random seedGen = new Random();
         Experiment this_experiment = new Experiment(args);
         System.out.println("evoTestSource: " + this_experiment.evoTestSource.getPath());
-        System.out.println("Total iterations: " +this_experiment.totalIterations);
+        System.out.println("Total iterations: " + this_experiment.totalIterations);
         this_experiment.writeExperimentHeader();
-        int currentEvoSeed=88;
-        int currentGinSeed=12;
+        int currentEvoSeed = 88;
+        int currentGinSeed = 12;
         String currentCriterion;
-        int currentIteration=0;
+        int currentIteration = 0;
         HashMap<String, String> coverageResults;
         HashMap<String, String> experimentResults;
         String[] evoOutputHeaders = this_experiment.getEvoOutputVariablesList();
         String[] headers = this_experiment.EXPERIMENT_HEADER;
 
-        for (int iteration=0; iteration < this_experiment.totalIterations; iteration++) {
+        for (int iteration = 0; iteration < this_experiment.totalIterations; iteration++) {
             experimentResults = new HashMap<String, String>();
             currentEvoSeed = seedGen.nextInt(100);
             seedGen.setSeed(currentEvoSeed);
@@ -481,7 +550,7 @@ public class Experiment {
 
             //read testStatistics into HashMap
 
-            for (int x=0;x< evoOutputHeaders.length; x++) {
+            for (int x = 0; x < evoOutputHeaders.length; x++) {
                 experimentResults.put(evoOutputHeaders[x], testStatistics.get(x));
             }
             //get coverage results and place into HashMap
@@ -528,23 +597,28 @@ public class Experiment {
                     experimentResults.put("Index", Integer.toString(currentIteration + 1));
                     currentGinSeed = seedGen.nextInt(100);
                     experimentResults.put("gin_seed", Integer.toString(currentGinSeed));
-                    HashMap<String,String> patchAnalysisResults = new HashMap<>();
-                    patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 1, false, true);
-                    System.out.println("Got best localsearch patch");
-                    experimentResults.putAll(patchAnalysisResults);
-                    ArrayList<String> dataEntry = new ArrayList<String>();
+                    List<HashMap<String, String>> patchAnalysisResultsList = new ArrayList<>();
+                    HashMap<String, String> patchAnalysisResults = new HashMap<>();
 
-                    for (int ind=0;ind<headers.length; ind++) {
-                        dataEntry.add(experimentResults.get(headers[ind]));
+                    patchAnalysisResultsList = this_experiment.getBestLocalSearchPatchWithIntermediate(currentGinSeed, 1, false, true);
+                    System.out.println("Got best localsearch patch list");
+                    for (int intermediate = 0; intermediate < patchAnalysisResultsList.size(); intermediate++) {
+                        patchAnalysisResults = patchAnalysisResultsList.get(intermediate);
+                        experimentResults.putAll(patchAnalysisResults);
+                        ArrayList<String> dataEntry = new ArrayList<String>();
+
+                        for (int ind = 0; ind < headers.length; ind++) {
+                            dataEntry.add(experimentResults.get(headers[ind]));
+                        }
+                        this_experiment.writeResult(dataEntry);
                     }
-                    this_experiment.writeResult(dataEntry);
                     currentIteration++;
                     System.out.println("CurrentIteration " + currentIteration);
                 }
 
             }
 
-             //global counter for iterations
+            //global counter for iterations
 
         }
         //Additional Patch using manually written Test (oracle)
@@ -553,22 +627,28 @@ public class Experiment {
         manualExperiment.putAll(manualTestStatistics);
 
         //Generate patches and datalines for current test file
+        List<HashMap<String, String>> patchAnalysisResultsList = new ArrayList<>();
+        HashMap<String, String> patchAnalysisResults = new HashMap<>();
+
         for (int lsCount = 0; lsCount < 20; lsCount++) {
             manualExperiment.put("Index", Integer.toString(currentIteration + 1));
             currentGinSeed = seedGen.nextInt(100);
-            HashMap<String, String> patchAnalysisResults = new HashMap<>();
-            patchAnalysisResults = this_experiment.getBestLocalSearchPatch(currentGinSeed, 1, true, false);
-            manualExperiment.putAll(patchAnalysisResults);
+            patchAnalysisResults = new HashMap<>();
 
-            ArrayList<String> dataEntry = new ArrayList<String>();
+            patchAnalysisResultsList = this_experiment.getBestLocalSearchPatchWithIntermediate(currentGinSeed, 1, true, false);
 
-            for (int ind=0;ind<headers.length; ind++) {
-                dataEntry.add(manualExperiment.get(headers[ind]));
+            for (int intermediate = 0; intermediate < patchAnalysisResultsList.size(); intermediate++) {
+                patchAnalysisResults = patchAnalysisResultsList.get(intermediate);
+                manualExperiment.putAll(patchAnalysisResults);
+
+                ArrayList<String> dataEntry = new ArrayList<String>();
+
+                for (int ind = 0; ind < headers.length; ind++) {
+                    dataEntry.add(manualExperiment.get(headers[ind]));
+                }
+                this_experiment.writeResult(dataEntry);
             }
-            this_experiment.writeResult(dataEntry);
         }
-
-
 
 
 

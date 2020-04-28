@@ -145,12 +145,12 @@ public class CoverageMeasurer {
                     System.out.println(numbermatcher.group(0));
                 }
                 else {
-                    Logger.error(String.format("No coverage value found during parsing of coverage criterion %d", parsedCriterion[x]));
+                    Logger.error(String.format("No coverage value found during parsing of coverage criterion %s", parsedCriterion[x]));
                     number = "NaN";
                 }
             }
             else {
-                Logger.error(String.format("No coverage metrics found during parsing of coverage criterion %d", parsedCriterion[x]));
+                Logger.error(String.format("No coverage metrics found during parsing of coverage criterion %s", parsedCriterion[x]));
                 number = "NaN";
             }
             parsedResult.put(parsedCriterion[x] + "_Coverage", number);
