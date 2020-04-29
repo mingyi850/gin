@@ -1,2 +1,0 @@
-"Index","target class","criterion","test_size","test_length","coverage","fitness","total_testgen_time","evo_seed","gin_seed","patch_text","valid_patch","all_tests_passed","execution_time","speedup(%)"
-"1","com.mycompany.app.App","WEAKMUTATION","8","9","0.9824561403508771","2.5","155331","96","12","| gin.edit.line.DeleteLine examples\maven-simple\src\main\java\com\mycompany\app\App.java:21 |","true","false","0","NaN"

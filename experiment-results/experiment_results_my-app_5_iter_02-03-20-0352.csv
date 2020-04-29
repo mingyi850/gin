@@ -1,4 +1,0 @@
-"Index","target class","criterion","test_size","test_length","coverage","fitness","total_testgen_time","evo_seed","gin_seed","patch_text","valid_patch","all_tests_passed","execution_time","speedup(%)"
-"1","com.mycompany.app.App","WEAKMUTATION","8","9","0.9824561403508771","2.5","179878","71","71","|","false","true","0","0.0"
-"2","com.mycompany.app.App","WEAKMUTATION","9","10","0.9824561403508771","2.5","162405","78","50","|","false","true","0","0.0"
-"3","com.mycompany.app.App","WEAKMUTATION","8","8","0.9824561403508771","2.5","179758","98","61","|","false","true","0","0.0"

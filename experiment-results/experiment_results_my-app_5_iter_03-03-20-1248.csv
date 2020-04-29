@@ -1,3 +1,0 @@
-"Index","target class","criterion","test_size","test_length","coverage","fitness","total_testgen_time","evo_seed","gin_seed","patch_text","valid_patch","all_tests_passed","execution_time","speedup(%)"
-"1","com.mycompany.app.App","BRANCH","7","8","1.0","0.0","66943","97","38","| gin.edit.line.DeleteLine examples\maven-simple\src\main\java\com\mycompany\app\App.java:21 |","true","true","1392870","99.913445"
-"2","com.mycompany.app.App","BRANCH","7","8","1.0","0.0","83442","34","26","| gin.edit.line.DeleteLine examples\maven-simple\src\main\java\com\mycompany\app\App.java:21 | gin.edit.line.CopyLine examples\maven-simple\src\main\java\com\mycompany\app\App.java:11 -> examples\maven-simple\src\main\java\com\mycompany\app\App.java:25 |","true","true","2810240","99.825645"
