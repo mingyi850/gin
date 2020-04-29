@@ -334,22 +334,6 @@ public class TestSampler {
 
     }
 
-    public static void main(String[] args) {
-        File testtest = new File("C:\\Users\\Admin\\Documents\\Computer Science\\Y3\\Final Year Project\\gin-fork\\examples\\maven-simple\\src\\test\\java\\com\\mycompany\\app\\App_ESTest.java");
-        int totalTests = 12;
-        TestSampler sampler = new TestSampler(testtest);
-
-        sampler.generateSamplePatchFile(sampler.generateNewFileName());
-
-        sampler.commentOutNTests(sampler.sampledTestFile, 6, 2);
-        System.out.println("Got here still");
-        //sampler.getTestLinesFromFile();
-        //replaceLineAtNumber(testtest, 16, "public class App_ESTest_SAMPLED extends App_ESTest_scaffolding {");
-        //System.out.println(getLineNumbersForPattern(testtest, "App_ESTest").toString());
-
-
-
-    }
 
     public File getTestFile() {
         return testFile;

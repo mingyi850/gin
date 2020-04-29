@@ -134,6 +134,7 @@ public class Experiment {
     @Argument(alias = "iter", description = "Number of iterations of experiment")
     protected Integer iterations = 1;
 
+    protected Integer ginRuns = 20;
 
 
     protected int totalIterations = 1;
@@ -593,7 +594,7 @@ public class Experiment {
                 }
                 experimentResults.putAll(coverageResults);
                 System.out.println("Experiment Results so far: " + experimentResults.toString());
-                for (int lsCount = 0; lsCount < 20; lsCount++) {
+                for (int lsCount = 0; lsCount < this_experiment.ginRuns; lsCount++) {
                     experimentResults.put("Index", Integer.toString(currentIteration + 1));
                     currentGinSeed = seedGen.nextInt(100);
                     experimentResults.put("gin_seed", Integer.toString(currentGinSeed));
@@ -622,6 +623,9 @@ public class Experiment {
 
         }
         //Additional Patch using manually written Test (oracle)
+        // First, generate evosuite test which optimises for all coverage.
+        this_experiment.generateEvosuiteTests(String.join(":",this_experiment.criterion_list), currentEvoSeed);
+
         HashMap<String, String> manualExperiment = new HashMap<String, String>();
         HashMap<String, String> manualTestStatistics = this_experiment.generateManualTestStatistics();
         manualExperiment.putAll(manualTestStatistics);
@@ -630,7 +634,7 @@ public class Experiment {
         List<HashMap<String, String>> patchAnalysisResultsList = new ArrayList<>();
         HashMap<String, String> patchAnalysisResults = new HashMap<>();
 
-        for (int lsCount = 0; lsCount < 20; lsCount++) {
+        for (int lsCount = 0; lsCount < this_experiment.ginRuns; lsCount++) {
             manualExperiment.put("Index", Integer.toString(currentIteration + 1));
             currentGinSeed = seedGen.nextInt(100);
             patchAnalysisResults = new HashMap<>();
@@ -648,6 +652,7 @@ public class Experiment {
                 }
                 this_experiment.writeResult(dataEntry);
             }
+            currentIteration++;
         }
 
 
