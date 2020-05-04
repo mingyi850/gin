@@ -104,6 +104,7 @@ public class PatchAnalyser {
         if (this.testClassName == null) {
             this.testClassName = this.className + "Test";
         }
+        System.out.println("patch analyser initialised with testClassName: " + testClassName);
     }
 
     private void analyse() {

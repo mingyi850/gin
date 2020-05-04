@@ -401,6 +401,7 @@ public class Experiment {
         else {
             evaluationTest = testClassName;
         }
+        System.out.println("Evaluation suite for this patch: " + evaluationTest);
         String patchTrim = patchText.trim();
         System.out.println("PatchTrim: " + patchTrim);
         System.out.println("PatchTrimLength: " + patchTrim.length());
@@ -422,7 +423,7 @@ public class Experiment {
 
     }
 
-    public static List<String> readLastLine(File filename) {
+    public static List<String> readLastLine(File filename) { // Test if is able to correctly read last line, check for exceptions (invalid input))
 
         String last, line;
         last = "";
