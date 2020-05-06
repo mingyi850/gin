@@ -62,6 +62,10 @@ dependencies {
 
 	// build example project so main project unit tests (e.g. profiler) will pass!
 	compile project(':gradle-simple')
+
+
+    testCompile 'org.evosuite:evosuite-standalone-runtime:1.0.6'
+
 }
 
 // This is handy to copy dependencies into a folder, for use in an IDE etc.
@@ -93,3 +97,4 @@ test {
         //showStandardStreams = true
     }
 }
+

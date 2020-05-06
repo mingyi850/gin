@@ -1,0 +1,144 @@
+\relax 
+\providecommand\zref@newlabel[2]{}
+\citation{petkesurvey}
+\citation{harman2012}
+\citation{harman2007}
+\citation{petkesurvey}
+\citation{bruceenergy}
+\citation{langdonharman2015}
+\citation{yuewu2015}
+\citation{qireiss2017}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}\protected@file@percent }
+\citation{petkegin}
+\citation{petkesurvey}
+\citation{petkesurvey}
+\citation{petkesurvey}
+\citation{cure}
+\citation{genprog}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background}{3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Genetic Improvement}{3}\protected@file@percent }
+\citation{langdonharman2015}
+\citation{petkespecialise}
+\citation{fitnessfunction}
+\citation{cure}
+\citation{cure}
+\citation{qireiss2017}
+\citation{petkegin}
+\citation{cure}
+\citation{yicorrelation}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1}Overview of a GI Process}{4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Overfitting}{4}\protected@file@percent }
+\citation{qireiss2017}
+\citation{xiongliu2018}
+\citation{yicorrelation}
+\citation{yumartinez2019}
+\citation{bruceenergy}
+\citation{yuewu2015}
+\citation{bruceenergy}
+\citation{cure}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Related Work}{5}\protected@file@percent }
+\citation{petkesurvey}
+\citation{petkegin}
+\citation{evosuitefaults}
+\citation{coveragecombination}
+\citation{qireiss2017}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Project Aims}{6}\protected@file@percent }
+\citation{petkegin}
+\citation{gincasestudy}
+\citation{plasticsurgery}
+\citation{bobbyblind}
+\citation{petkegin}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Dataset and Tools}{7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Gin}{7}\protected@file@percent }
+\citation{pyggi2}
+\citation{evosuitefaults}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}EvoSuite}{8}\protected@file@percent }
+\citation{testingtextbook}
+\citation{mutation1}
+\citation{mutation2}
+\citation{strongweakmutation}
+\citation{outputdiversity}
+\citation{coveragecombination}
+\citation{locogp}
+\citation{locogp}
+\citation{cure}
+\citation{souzagouesgenprog2018}
+\citation{gouesrepair2013}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}LocoGP Benchmark Set}{10}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Methodology}{11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Modifications to Gin}{11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.1}Addition of Constructors}{11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.2}Extraction of Process Data}{11}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.3}Inter-process communication}{12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.1.4}Sampling of Test Suites}{12}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Testing of modifications to Gin}{13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Experimental Setup}{13}\protected@file@percent }
+\citation{cure}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Data Collection and Runtime}{15}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Results and Analysis}{16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Research Question 1: How does test suite generation criterion and coverage metrics affect overfitting in generated patches?}{16}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Out of 88 unique test suites generated, Gin managed to successfully find a good patch for 48, with a total success rate of 0.545\%}}{17}\protected@file@percent }
+\newlabel{tab:table1}{{1}{17}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces The number of successfully generated patches split into correct and incorrect patches, grouped by the test generation criterion of the training test suite. Test suites generated optimising for branch and conditional branch coverage were able to find the highest number of non-overfitting patches at 31 and 27 respectively. Additionally, branch coverage generated less overfitting test suites than any other generation criterion, with only 66 overfitting test suites.}}{18}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Comparing the proportions of patches which pass the evaluation suite for each coverage metric, we see that branch coverage produces the highest number of correct patches by far, with 32\% of patches produced being non-overfitting}}{18}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Gin managed to produce a non-overfitting patch 98 times over 1760 runs. Additionally, branch coverage had the highest sucess generating non-overfitting patches}}{19}\protected@file@percent }
+\newlabel{tab:table2}{{2}{19}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Plotting the patches against the different coverage metrics, we obtain a series of regression lines for each coverage metric, with p values 0.04, 0.02, 0.08 and 0.07 for branch, line, weakmutation and conditional-branch coverage respectively. There was a positive correlation observed between most test suite coverage metrics and a test suite’s ability to produce patches which do not overfit. Only conditional branch coverage was seen to negatively affect the rate of overfitting. }}{20}\protected@file@percent }
+\citation{coveragenotcorrelated}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces A comparison of only patches generated using test suites for which branch coverage differed from conditional branch coverage. Test suites with low branch coverage almost always produced patches which overfit. Conversely, low conditional-branch coverage still yielded a high rate of patches which did not overfit. Regression lines are used to illustrate the general trend and have p-values of $2.5e-5$ and 0.19 for branch and conditional branch coverage respectively. }}{21}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}How does test suite generation criterion and coverage metrics of generated tests affect the performance of the generated patches?}{22}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces We observe the same broad trends in the intermediate patches as we did in the final patches in Figure 4. However, the correlation between the coverage metrics and overfitting is generally more pronounced, and the non-overfitting rate is higher across the board. All regression lines obtained have p-values of $3.4e-27$, $2.4e-29$, $1.4e-30$ and 0.08 for branch, line, weakmutation and conditional branch coverage respectively}}{23}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Test suites optimising for branch coverage produced patches which showed the highest mean speedup\% by far at 38\% with a standard deviation of 34.5\%. Test suites optimising for conditional branch coverage produced patches which provided the least improvements at a mean of 13.2\%, but with the smallest standard variation at 25.8\%. Automated test suites optimised for branch coverage showed an increase in performance compared to other test suite criteria, with a p-value of 0.01. }}{24}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.1}An overview of results so far: Test suite generation criterion and coverage metrics}{25}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces A slight negative correlation is seen between the speedup brought by the patches and test suite coverage metrics. P values for the above lines are 0.03, 0.08, 0.09 and 0.42 for branch, line, weakmutation and cbranch coverage respectively. The exceptionally high p-value on the trend found in cbranch coverage requires additional examination to ascertain the exact relationship}}{26}\protected@file@percent }
+\citation{yicorrelation}
+\citation{cure}
+\citation{coveragecombination}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}How do automated test suites compare against user-written test-suites as inputs to the GI Process?}{27}\protected@file@percent }
+\citation{evosuitecompetition}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Patches generated using manual test suites overfit much less than those generated using automated test suites}}{28}\protected@file@percent }
+\citation{evosuitefaults}
+\citation{coveragenotcorrelated}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Patches from automatically generated tests showed a significantly higher increase in performance than those generated from manual test suites. These results have a p-value of 0.0003, which show that there is sufficient evidence to support our conclusion that automated test suites produce patches which produce a higher increase in performance. }}{29}\protected@file@percent }
+\citation{locogp}
+\citation{evosuitecompetition}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Head to head comparision between automated and manual tests used in the study. Taking the mean of all 4 coverage metrics, we see that manual tests had slightly lower average coverage at 88\% compared to that of EvoSuite-generated tests at 90\%. Despite this manual test, suites still managed to produce patches which overfit far less often}}{30}\protected@file@percent }
+\newlabel{tab:table3}{{3}{30}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Threats to Validity}{30}\protected@file@percent }
+\citation{yuewu2015}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusions and Future Work}{31}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Conclusion}{32}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Future Work}{33}\protected@file@percent }
+\bibcite{petkesurvey}{1}
+\bibcite{harman2012}{2}
+\bibcite{harman2007}{3}
+\bibcite{bruceenergy}{4}
+\bibcite{langdonharman2015}{5}
+\bibcite{yuewu2015}{6}
+\bibcite{qireiss2017}{7}
+\bibcite{petkegin}{8}
+\bibcite{cure}{9}
+\bibcite{genprog}{10}
+\bibcite{petkespecialise}{11}
+\bibcite{fitnessfunction}{12}
+\bibcite{yicorrelation}{13}
+\bibcite{xiongliu2018}{14}
+\bibcite{yumartinez2019}{15}
+\bibcite{evosuitefaults}{16}
+\bibcite{coveragecombination}{17}
+\bibcite{gincasestudy}{18}
+\bibcite{plasticsurgery}{19}
+\bibcite{bobbyblind}{20}
+\bibcite{pyggi2}{21}
+\bibcite{testingtextbook}{22}
+\bibcite{mutation1}{23}
+\bibcite{mutation2}{24}
+\bibcite{strongweakmutation}{25}
+\bibcite{outputdiversity}{26}
+\bibcite{souzagouesgenprog2018}{27}
+\bibcite{statsmodel}{28}
+\bibcite{gouesrepair2013}{29}
+\bibcite{coveragenotcorrelated}{30}
+\bibcite{evosuitecompetition}{31}
+\bibcite{locogp}{32}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Appendix}{36}\protected@file@percent }

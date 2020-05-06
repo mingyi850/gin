@@ -1,0 +1,30 @@
+\contentsline {section}{\numberline {1}Introduction}{2}%
+\contentsline {section}{\numberline {2}Background}{3}%
+\contentsline {subsection}{\numberline {2.1}Genetic Improvement}{3}%
+\contentsline {subsubsection}{\numberline {2.1.1}Overview of a GI Process}{4}%
+\contentsline {subsection}{\numberline {2.2}Overfitting}{4}%
+\contentsline {subsection}{\numberline {2.3}Related Work}{5}%
+\contentsline {section}{\numberline {3}Project Aims}{6}%
+\contentsline {section}{\numberline {4}Dataset and Tools}{7}%
+\contentsline {subsection}{\numberline {4.1}Gin}{7}%
+\contentsline {subsection}{\numberline {4.2}EvoSuite}{8}%
+\contentsline {subsection}{\numberline {4.3}LocoGP Benchmark Set}{10}%
+\contentsline {section}{\numberline {5}Methodology}{11}%
+\contentsline {subsection}{\numberline {5.1}Modifications to Gin}{11}%
+\contentsline {subsubsection}{\numberline {5.1.1}Addition of Constructors}{11}%
+\contentsline {subsubsection}{\numberline {5.1.2}Extraction of Process Data}{11}%
+\contentsline {subsubsection}{\numberline {5.1.3}Inter-process communication}{12}%
+\contentsline {subsubsection}{\numberline {5.1.4}Sampling of Test Suites}{12}%
+\contentsline {subsection}{\numberline {5.2}Testing of modifications to Gin}{13}%
+\contentsline {subsection}{\numberline {5.3}Experimental Setup}{13}%
+\contentsline {subsection}{\numberline {5.4}Data Collection and Runtime}{15}%
+\contentsline {section}{\numberline {6}Results and Analysis}{16}%
+\contentsline {subsection}{\numberline {6.1}Research Question 1: How does test suite generation criterion and coverage metrics affect overfitting in generated patches?}{16}%
+\contentsline {subsection}{\numberline {6.2}How does test suite generation criterion and coverage metrics of generated tests affect the performance of the generated patches?}{22}%
+\contentsline {subsubsection}{\numberline {6.2.1}An overview of results so far: Test suite generation criterion and coverage metrics}{25}%
+\contentsline {subsection}{\numberline {6.3}How do automated test suites compare against user-written test-suites as inputs to the GI Process?}{27}%
+\contentsline {section}{\numberline {7}Threats to Validity}{30}%
+\contentsline {section}{\numberline {8}Conclusions and Future Work}{31}%
+\contentsline {subsection}{\numberline {8.1}Conclusion}{32}%
+\contentsline {subsection}{\numberline {8.2}Future Work}{33}%
+\contentsline {section}{\numberline {A}Appendix}{36}%
